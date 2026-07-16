@@ -1,1 +1,5 @@
-export interface Categorie {}
+export interface Categorie {
+  id: number;
+  nom: string;
+  description: string;
+}
