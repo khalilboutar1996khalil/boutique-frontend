@@ -1,59 +1,57 @@
-# BoutiqueFrontend
+# 🛍️ Boutique - Frontend Angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.19.
+Interface d'administration complète pour la gestion de boutique en ligne, développée avec Angular 21 et connectée à l'API Spring Boot.
 
-## Development server
+## 🚀 Fonctionnalités
 
-To start a local development server, run:
+- **Authentification JWT** avec Login/Register et gestion de session
+- **Dashboard** avec statistiques en temps réel (chiffre d'affaires, commandes, clients)
+- **Gestion des produits** — CRUD complet avec upload d'image et sélection de catégorie
+- **Gestion des catégories** — CRUD complet
+- **Gestion des clients** — CRUD complet
+- **Gestion des commandes** — création, changement de statut
+- **Page détails commande** avec timeline de suivi visuelle
+- **Routes protégées** avec AuthGuard
+- **Interceptor JWT** — ajout automatique du token dans les requêtes
 
-```bash
+## 🛠️ Stack technique
+
+- Angular 21 (Standalone Components)
+- TypeScript
+- RxJS
+- Angular Signals
+- HttpClient + Interceptors
+- Angular Router (routes imbriquées + guards)
+
+## 📦 Installation
+
+\`\`\`bash
+git clone https://github.com/khalilboutar1996khalil/boutique-frontend.git
+cd boutique-frontend
+npm install
 ng serve
-```
+\`\`\`
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+L'application démarre sur `http://localhost:4200`
 
-## Code scaffolding
+⚠️ Le backend Spring Boot doit être lancé sur `http://localhost:8080`
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🔐 Comptes de test
 
-```bash
-ng generate component component-name
-```
+| Username | Password | Rôle |
+|----------|----------|------|
+| admin    | 123456   | ADMIN |
+| vendeur  | 123456   | VENDEUR |
+| client   | 123456   | CLIENT |
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 📄 Architecture
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+\`\`\`
+src/app/
+├── models/         # Interfaces TypeScript
+├── services/       # Services HTTP (Auth, Produit, Client...)
+├── pages/          # Components des pages
+├── layout/         # Layout commun (sidebar + topbar)
+├── guards/         # AuthGuard
+└── interceptors/   # JwtInterceptor
+\`\`\`
