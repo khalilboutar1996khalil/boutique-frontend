@@ -8,6 +8,7 @@ import { Categories } from './pages/categories/categories';
 import { Produits } from './pages/produits/produits';
 import { Clients } from './pages/clients/clients';
 import { Commandes } from './pages/commandes/commandes';
+import { CommandeDetails } from './pages/commande-details/commande-details';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -22,7 +23,9 @@ export const routes: Routes = [
        { path: 'produits', component: Produits},
       { path: 'categories', component: Categories },
       { path: 'clients', component: Clients },
-      {path: 'commandes', component: Commandes}
+      {path: 'commandes', component: Commandes},
+      { path: 'commandes/:id', component: CommandeDetails },
+
     ]
   },
   { path: '**', redirectTo: '/login' }

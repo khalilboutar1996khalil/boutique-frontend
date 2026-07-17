@@ -133,3 +133,6 @@
   width: 100%;        /* ← ajoute si manquant */
   box-sizing: border-box;
 }
+.content {
+  background: #f5f5f0; /* déjà présent normalement */
+}

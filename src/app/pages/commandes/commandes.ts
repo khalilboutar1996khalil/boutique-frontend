@@ -7,10 +7,10 @@ import { Produit } from '../../models/produit';
 import { ProduitService } from '../../services/produit';
 import { CommandeService } from '../../services/commande';
 import { ClientService } from '../../services/client';
-
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-commandes',
-  imports: [CommonModule, FormsModule],
+  imports:  [CommonModule, FormsModule, RouterLink],
   templateUrl: './commandes.html',
   styleUrl: './commandes.css',
 })
@@ -91,4 +91,5 @@ export class Commandes implements OnInit {
       }
     });
   }
+  
 }

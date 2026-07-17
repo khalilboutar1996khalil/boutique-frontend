@@ -1,0 +1,80 @@
+<div class="details-page">
+  <div class="page-header">
+    <h1>Commande #{{ commandeId }}</h1>
+    <button class="btn-primary" (click)="retour()">
+      <i class="ti ti-arrow-left"></i> Retour
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Suivi de la commande</div>
+    <div class="timeline">
+      <div class="step">
+        <div class="step-line" [class.line-active]="estComplete('CONFIRMEE')"></div>
+        <div class="circle" [class.circle-active]="estComplete('EN_ATTENTE')"
+          [class.circle-current]="estActuel('EN_ATTENTE')">
+          <i class="ti ti-check" *ngIf="estComplete('EN_ATTENTE') && !estActuel('EN_ATTENTE')"></i>
+<i class="ti ti-clock" *ngIf="estActuel('EN_ATTENTE')"></i>
+<i class="ti ti-circle" *ngIf="!estComplete('EN_ATTENTE') && !estActuel('EN_ATTENTE')"></i>
+        </div>
+        <span class="lbl">Passée</span>
+      </div>
+
+      <div class="step">
+        <div class="step-line" [class.line-active]="estComplete('LIVREE')"></div>
+        <div class="circle" [class.circle-active]="estComplete('CONFIRMEE')"
+          [class.circle-current]="estActuel('CONFIRMEE')">
+         <i class="ti ti-check" *ngIf="estComplete('CONFIRMEE') && !estActuel('CONFIRMEE')"></i>
+<i class="ti ti-hourglass" *ngIf="estActuel('CONFIRMEE')"></i>
+<i class="ti ti-circle" *ngIf="!estComplete('CONFIRMEE') && !estActuel('CONFIRMEE')"></i>
+        </div>
+        <span class="lbl">Confirmée</span>
+      </div>
+
+      <div class="step">
+        <div class="circle" [class.circle-active]="estComplete('LIVREE')" [class.circle-current]="estActuel('LIVREE')">
+         <i class="ti ti-check" *ngIf="estComplete('LIVREE') && !estActuel('LIVREE')"></i>
+<i class="ti ti-truck" *ngIf="estActuel('LIVREE')"></i>
+<i class="ti ti-circle" *ngIf="!estComplete('LIVREE') && !estActuel('LIVREE')"></i>
+        </div>
+        <span class="lbl">Livrée</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="commande()">
+    <div class="card-title">Informations de la commande</div>
+    <div class="infos-simple">
+      <div class="ligne-info">
+        <span class="cle">Client</span>
+        <span class="valeur">{{ commande()!.clientNom }}</span>
+      </div>
+      <div class="ligne-info">
+        <span class="cle">Montant</span>
+        <span class="valeur valeur-montant">{{ commande()!.montantTotal }} TND</span>
+      </div>
+      <div class="ligne-info">
+        <span class="cle">Date</span>
+        <span class="valeur">{{ commande()!.dateCommande | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Historique détaillé</div>
+    <div class="historique-list">
+      <div class="historique-row" *ngFor="let h of historique()">
+        <span class="badge" [class.badge-warning]="h.statut === 'EN_ATTENTE'"
+          [class.badge-success]="h.statut === 'CONFIRMEE'" [class.badge-info]="h.statut === 'LIVREE'">
+          {{ h.statut }}
+        </span>
+        <span class="historique-date">{{ h.dateChangement | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <div class="empty-state" *ngIf="historique().length === 0">
+        <i class="ti ti-history"></i>
+        <span>Aucun historique disponible</span>
+      </div>
+    </div>
+  </div>
+</div>
