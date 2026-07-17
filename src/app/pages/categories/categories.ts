@@ -71,7 +71,7 @@ messageErreur = signal('');
         },
         error: (error) => {
           console.error('Erreur lors de la modification de la catégorie :', error);
-          this.messageErreur.set("Impossible d'enregistrer la catégorie.");
+          this.messageErreur.set(error.error?.message || "Impossible d'enregistrer la catégorie.");
         }
       });
     } else {
@@ -82,7 +82,7 @@ messageErreur = signal('');
         },
         error: (error) => {
           console.error('Erreur lors de la création de la catégorie :', error);
-          this.messageErreur.set("Impossible d'enregistrer la catégorie.");
+          this.messageErreur.set(error.error?.message || "Impossible d'enregistrer la catégorie.");
         }
       });
     }

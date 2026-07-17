@@ -48,13 +48,17 @@
 
 <div class="modal-overlay" *ngIf="afficherFormulaire" (click)="fermerFormulaire()">
   <div class="modal-box" (click)="$event.stopPropagation()">
+
     <div class="modal-header">
       <h2>{{ modeEdition ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
-      <button class="btn-icon" (click)="fermerFormulaire()">
+      <button class="btn-close" (click)="fermerFormulaire()">
         <i class="ti ti-x"></i>
       </button>
     </div>
-
+    <div class="alerte" *ngIf="messageErreur()">
+      <i class="ti ti-alert-triangle"></i>
+      <span>{{ messageErreur() }}</span>
+    </div>
     <form (ngSubmit)="enregistrer()">
       <div class="champ">
         <label>Nom</label>
@@ -63,12 +67,11 @@
 
       <div class="champ">
         <label>Description</label>
-        <textarea [(ngModel)]="categorieEnCours.description" name="description" rows="3" placeholder="Description de la catégorie"></textarea>
+        <textarea [(ngModel)]="categorieEnCours.description" name="description" rows="3"
+          placeholder="Description de la catégorie"></textarea>
       </div>
 
-      <div class="erreur" *ngIf="messageErreur">
-        {{ messageErreur }}
-      </div>
+
 
       <div class="modal-actions">
         <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>

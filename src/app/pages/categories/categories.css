@@ -83,28 +83,49 @@
 }
 
 .btn-icon {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e5e5;
+  background: #ffffff;
   border-radius: 8px;
-  color: #666;
-  font-size: 17px;
+  color: #185FA5;
+  font-size: 15px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
+  transition: all 0.2s;
 }
 
 .btn-icon:hover {
-  background: #f0f0f0;
-  color: #1a1a1a;
+  background: #E6F1FB;
+  border-color: #378ADD;
+}
+
+.btn-icon-danger {
+  color: #A32D2D;
 }
 
 .btn-icon-danger:hover {
   background: #FCEBEB;
-  color: #A32D2D;
+  border-color: #E24B4A;
+}
+
+.btn-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f5f5f0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-close:hover {
+  background: #e5e5e5;
 }
 
 .tableau {
@@ -304,11 +325,28 @@ thead .col-actions {
   box-shadow: 0 0 0 4px rgba(55, 138, 221, 0.12);
 }
 
-.erreur {
-  background: #FCEBEB;
-  color: #A32D2D;
+.alerte {
+  background: #FEF9E7;
+  border: 1px solid #F5D897;
+  color: #854F0B;
   font-size: 13px;
   padding: 12px 16px;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  animation: shake 0.4s ease;
+}
+
+.alerte i {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
 }
