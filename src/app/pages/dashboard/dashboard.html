@@ -1,1 +1,103 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="page-subtitle">Vue d'ensemble de votre boutique</p>
+  </div>
+
+  <div class="stats-grid" *ngIf="stats()">
+    <div class="stat-card">
+      <div class="stat-icon icon-green">
+        <i class="ti ti-currency-dollar"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Chiffre d'affaires</span>
+        <span class="stat-value">{{ stats()!.chiffreAffaires }} TND</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-blue">
+        <i class="ti ti-shopping-cart"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Commandes</span>
+        <span class="stat-value">{{ stats()!.totalCommandes }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-purple">
+        <i class="ti ti-users"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Clients</span>
+        <span class="stat-value">{{ stats()!.totalClients }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-orange">
+        <i class="ti ti-box"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Produits</span>
+        <span class="stat-value">{{ stats()!.totalProduits }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col" *ngIf="stats()">
+    <div class="card">
+      <div class="card-title">Commandes par statut</div>
+      <div class="statut-list">
+        <div class="statut-row">
+          <span class="statut-dot dot-warning"></span>
+          <span class="statut-label">En attente</span>
+          <span class="statut-value">{{ stats()!.commandesEnAttente }}</span>
+        </div>
+        <div class="statut-row">
+          <span class="statut-dot dot-success"></span>
+          <span class="statut-label">Confirmées</span>
+          <span class="statut-value">{{ stats()!.commandesConfirmees }}</span>
+        </div>
+        <div class="statut-row">
+          <span class="statut-dot dot-info"></span>
+          <span class="statut-label">Livrées</span>
+          <span class="statut-value">{{ stats()!.commandesLivrees }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Répartition visuelle</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span class="bar-label">Attente</span>
+          <div class="bar-track">
+            <div class="bar-fill fill-warning" [style.width.%]="(stats()!.commandesEnAttente / stats()!.totalCommandes) * 100"></div>
+          </div>
+          <span class="bar-count">{{ stats()!.commandesEnAttente }}</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Confirmée</span>
+          <div class="bar-track">
+            <div class="bar-fill fill-success" [style.width.%]="(stats()!.commandesConfirmees / stats()!.totalCommandes) * 100"></div>
+          </div>
+          <span class="bar-count">{{ stats()!.commandesConfirmees }}</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Livrée</span>
+          <div class="bar-track">
+            <div class="bar-fill fill-info" [style.width.%]="(stats()!.commandesLivrees / stats()!.totalCommandes) * 100"></div>
+          </div>
+          <span class="bar-count">{{ stats()!.commandesLivrees }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="!stats()">
+    <i class="ti ti-loader-2 spin"></i>
+    <span>Chargement des statistiques...</span>
+  </div>
+</div>

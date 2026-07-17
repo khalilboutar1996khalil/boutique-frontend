@@ -1,0 +1,52 @@
+<div class="app-layout">
+  <div class="sidebar">
+    <div class="logo">
+      <i class="ti ti-shopping-bag"></i>
+      <span>Boutique</span>
+    </div>
+
+    <span class="nav-section">Principal</span>
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <i class="ti ti-layout-dashboard"></i> Dashboard
+    </a>
+    <a routerLink="/commandes" routerLinkActive="active" class="nav-item">
+      <i class="ti ti-shopping-cart"></i> Commandes
+    </a>
+
+    <span class="nav-section">Catalogue</span>
+    <a routerLink="/produits" routerLinkActive="active" class="nav-item">
+      <i class="ti ti-box"></i> Produits
+    </a>
+    <a routerLink="/categories" routerLinkActive="active" class="nav-item">
+      <i class="ti ti-tags"></i> Catégories
+    </a>
+
+    <span class="nav-section">Gestion</span>
+    <a routerLink="/clients" routerLinkActive="active" class="nav-item">
+      <i class="ti ti-users"></i> Clients
+    </a>
+
+    <div class="nav-bottom">
+      <div class="nav-item" (click)="deconnecter()">
+        <i class="ti ti-logout"></i> Déconnexion
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"></div>
+      <div class="topbar-actions">
+        <div class="avatar">{{ username?.charAt(0)?.toUpperCase() }}</div>
+        <div class="user-info">
+          <span class="user-name">{{ username }}</span>
+          <span class="user-role">{{ role }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

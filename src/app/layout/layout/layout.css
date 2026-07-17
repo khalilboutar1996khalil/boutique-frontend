@@ -1,0 +1,135 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: #f5f5f0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.sidebar {
+  width: 240px;
+  background: #14213d;
+  padding: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.logo i {
+  font-size: 22px;
+  color: #378ADD;
+}
+
+.nav-section {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  padding: 16px 20px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nav-item i {
+  font-size: 18px;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(55,138,221,0.15);
+  color: #fff;
+  border-left: 3px solid #378ADD;
+  padding-left: 17px;
+}
+
+.nav-bottom {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 8px;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;         /* ← important pour flex ! */
+  width: 100%;           /* ← ajoute si manquant */
+}
+.topbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #E6F1FB;
+  color: #185FA5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.user-role {
+  font-size: 11px;
+  color: #666;
+}
+
+.content {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+  width: 100%;        /* ← ajoute si manquant */
+  box-sizing: border-box;
+}

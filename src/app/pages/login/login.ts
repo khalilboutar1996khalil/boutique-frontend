@@ -23,8 +23,10 @@ export class Login {
   seConnecter() {
     this.authService.login({ username: this.username, password: this.password }).subscribe({
       next: (response) => {
+        console.log("ffffffffffffffffffffffffffffff");
+
         this.authService.sauvegarderToken(response);
-        this.route.navigate(['/']);
+        this.route.navigate(['/dashboard']);
       },
       error: (error) => {
         console.error('Erreur lors de la connexion :', error);
