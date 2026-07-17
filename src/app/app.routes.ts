@@ -7,6 +7,7 @@ import { Layout } from './layout/layout/layout';
 import { Categories } from './pages/categories/categories';
 import { Produits } from './pages/produits/produits';
 import { Clients } from './pages/clients/clients';
+import { Commandes } from './pages/commandes/commandes';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -21,6 +22,7 @@ export const routes: Routes = [
        { path: 'produits', component: Produits},
       { path: 'categories', component: Categories },
       { path: 'clients', component: Clients },
+      {path: 'commandes', component: Commandes}
     ]
   },
   { path: '**', redirectTo: '/login' }
