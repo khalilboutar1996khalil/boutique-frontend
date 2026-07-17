@@ -1,1 +1,55 @@
-<p>register works!</p>
+<div class="auth-page">
+  <div class="auth-box">
+    <div class="auth-icon">
+      <i class="ti ti-user-plus"></i>
+    </div>
+    <h1>Inscription</h1>
+    <p class="sous-titre">Créez votre compte en 30 secondes</p>
+
+    <div class="alerte" *ngIf="messageErreur()">
+      <i class="ti ti-alert-triangle"></i>
+      <span>{{ messageErreur() }}</span>
+    </div>
+
+    <div class="success" *ngIf="messageSucces()">
+      <i class="ti ti-check"></i>
+      <span>{{ messageSucces() }}</span>
+    </div>
+    <form (ngSubmit)="inscrire()">
+      <div class="champ">
+        <label>Username</label>
+        <input type="text" [(ngModel)]="username" name="username" placeholder="khalil" required>
+      </div>
+
+      <div class="champ">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="email" name="email" placeholder="khalil@email.com" required>
+      </div>
+
+      <div class="champ">
+        <label>Mot de passe</label>
+        <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required minlength="6">
+      </div>
+
+      <div class="champ">
+        <label>Rôle</label>
+        <select [(ngModel)]="role" name="role">
+          <option value="CLIENT">Client</option>
+          <option value="VENDEUR">Vendeur</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-full" [disabled]="isLoading()">
+        <span *ngIf="!isLoading()">Créer mon compte</span>
+        <span *ngIf="isLoading()" class="loading-content">
+          <i class="ti ti-loader-2 spin"></i> Création en cours...
+        </span>
+      </button>
+    </form>
+
+    <p class="lien-bas">
+      Déjà un compte ? <a routerLink="/login">Se connecter</a>
+    </p>
+  </div>
+</div>

@@ -1,1 +1,31 @@
-<p>login works!</p>
+<div class="auth-page">
+  <div class="auth-box">
+    <div class="auth-icon">
+      <i class="ti ti-shopping-bag"></i>
+    </div>
+    <h1>Connexion</h1>
+    <p class="sous-titre">Accédez à votre espace boutique</p>
+
+    <form (ngSubmit)="seConnecter()">
+      <div class="champ">
+        <label>Username</label>
+        <input type="text" [(ngModel)]="username" name="username" placeholder="khalil" required>
+      </div>
+
+      <div class="champ">
+        <label>Mot de passe</label>
+        <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required>
+      </div>
+
+      <div class="erreur" *ngIf="messageErreur">
+        {{ messageErreur }}
+      </div>
+
+      <button type="submit" class="btn-full">Se connecter</button>
+    </form>
+
+    <p class="lien-bas">
+      Pas de compte ? <a routerLink="/register">S'inscrire</a>
+    </p>
+  </div>
+</div>

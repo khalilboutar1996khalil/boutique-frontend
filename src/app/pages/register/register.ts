@@ -1,9 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-register',
-  imports: [],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register {}
+export class Register {
+
+  username: string = '';
+  email: string = '';
+  password: string = '';
+  role: string = 'CLIENT';
+
+  messageErreur = signal('');
+  messageSucces = signal('');
+  isLoading = signal(false);
+
+  constructor(private authService: AuthService, private route: Router) { }
+
+  inscrire() {
+    this.isLoading.set(true);
+    this.messageErreur.set('');
+    this.messageSucces.set('');
+
+    this.authService.register({
+      username: this.username,
+      email: this.email,
+      password: this.password,
+      role: this.role
+    }).subscribe({
+      next: (response) => {
+        this.messageSucces.set("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+        this.isLoading.set(false);
+        setTimeout(() => this.route.navigate(['/login']), 2000);
+      },
+      error: (error) => {
+        try {
+          const erreurParsee = JSON.parse(error.error);
+          this.messageErreur.set(erreurParsee.message);
+        } catch (e) {
+          this.messageErreur.set("Une erreur est survenue lors de l'inscription.");
+        }
+        this.isLoading.set(false);
+      }
+    });
+  }
+}
