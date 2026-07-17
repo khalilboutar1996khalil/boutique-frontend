@@ -1,1 +1,100 @@
-<p>clients works!</p>
+<div class="clients">
+  <div class="page-header">
+    <div>
+      <h1>Clients</h1>
+      <p class="page-subtitle">Gérez votre base de clients</p>
+    </div>
+    <button class="btn-primary" (click)="ouvrirFormulaireCreation()">
+      <i class="ti ti-plus"></i> Nouveau client
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="chargement()">
+    <i class="ti ti-loader-2 spin"></i>
+    <span>Chargement des clients...</span>
+  </div>
+
+  <div class="card" *ngIf="!chargement()">
+    <div class="empty-state" *ngIf="clients().length === 0">
+      <i class="ti ti-users"></i>
+      <span>Aucun client pour le moment</span>
+    </div>
+
+    <table class="tableau" *ngIf="clients().length > 0">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of clients()">
+          <td class="cell-nom">{{ client.nom }}</td>
+          <td>{{ client.email }}</td>
+          <td>{{ client.telephone }}</td>
+          <td class="col-actions">
+            <button class="btn-icon" title="Modifier" (click)="ouvrirFormulaireEdition(client)">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-icon btn-icon-danger" title="Supprimer" (click)="demanderSuppression(client.id)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="afficherFormulaire()" (click)="fermerFormulaire()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>{{ clientEnEdition ? 'Modifier le client' : 'Nouveau client' }}</h2>
+      <button class="btn-close" (click)="fermerFormulaire()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="alerte" *ngIf="messageErreur()">
+      <i class="ti ti-alert-triangle"></i>
+      <span>{{ messageErreur() }}</span>
+    </div>
+    <form (ngSubmit)="enregistrer()">
+      <div class="champ">
+        <label>Nom</label>
+        <input type="text" [(ngModel)]="nom" name="nom" placeholder="Ex : Ahmed Ben Ali" required>
+      </div>
+
+      <div class="champ">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="email" name="email" placeholder="exemple@email.com" required>
+      </div>
+
+      <div class="champ">
+        <label>Téléphone</label>
+        <input type="tel" [(ngModel)]="telephone" name="telephone" placeholder="+216 12 345 678" required>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
+        <button type="submit" class="btn-primary">{{ clientEnEdition ? 'Enregistrer' : 'Créer' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="idASupprimer !== null" (click)="annulerSuppression()">
+  <div class="modal-box modal-confirm" (click)="$event.stopPropagation()">
+    <div class="modal-icon-danger">
+      <i class="ti ti-alert-triangle"></i>
+    </div>
+    <h2>Supprimer ce client ?</h2>
+    <p class="page-subtitle">Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" (click)="annulerSuppression()">Annuler</button>
+      <button type="button" class="btn-danger" (click)="confirmerSuppression()">Supprimer</button>
+    </div>
+  </div>
+</div>
