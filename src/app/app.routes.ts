@@ -4,6 +4,7 @@ import { Register } from './pages/register/register';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { authGuard } from './guards/auth-guard';
 import { Layout } from './layout/layout/layout';
+import { Categories } from './pages/categories/categories';
 import { Produits } from './pages/produits/produits';
 
 export const routes: Routes = [
@@ -17,6 +18,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: Dashboard },
        { path: 'produits', component: Produits},
+      { path: 'categories', component: Categories },
     ]
   },
   { path: '**', redirectTo: '/login' }

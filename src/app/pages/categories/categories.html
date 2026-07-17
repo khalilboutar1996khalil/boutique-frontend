@@ -1,1 +1,93 @@
-<p>categories works!</p>
+<div class="categories">
+  <div class="page-header">
+    <div>
+      <h1>Catégories</h1>
+      <p class="page-subtitle">Gérez les catégories de vos produits</p>
+    </div>
+    <button class="btn-primary" (click)="ouvrirAjout()">
+      <i class="ti ti-plus"></i> Nouvelle catégorie
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="chargement()">
+    <i class="ti ti-loader-2 spin"></i>
+    <span>Chargement des catégories...</span>
+  </div>
+
+  <div class="card" *ngIf="!chargement()">
+    <div class="empty-state" *ngIf="categories().length === 0">
+      <i class="ti ti-tags"></i>
+      <span>Aucune catégorie pour le moment</span>
+    </div>
+
+    <table class="tableau" *ngIf="categories().length > 0">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Description</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let categorie of categories()">
+          <td class="cell-nom">{{ categorie.nom }}</td>
+          <td class="cell-description">{{ categorie.description }}</td>
+          <td class="col-actions">
+            <button class="btn-icon" title="Modifier" (click)="ouvrirEdition(categorie)">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-icon btn-icon-danger" title="Supprimer" (click)="demanderSuppression(categorie.id)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="afficherFormulaire" (click)="fermerFormulaire()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ modeEdition ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
+      <button class="btn-icon" (click)="fermerFormulaire()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <form (ngSubmit)="enregistrer()">
+      <div class="champ">
+        <label>Nom</label>
+        <input type="text" [(ngModel)]="categorieEnCours.nom" name="nom" placeholder="Ex : Vêtements" required>
+      </div>
+
+      <div class="champ">
+        <label>Description</label>
+        <textarea [(ngModel)]="categorieEnCours.description" name="description" rows="3" placeholder="Description de la catégorie"></textarea>
+      </div>
+
+      <div class="erreur" *ngIf="messageErreur">
+        {{ messageErreur }}
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
+        <button type="submit" class="btn-primary">{{ modeEdition ? 'Enregistrer' : 'Créer' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="idASupprimer !== null" (click)="annulerSuppression()">
+  <div class="modal-box modal-confirm" (click)="$event.stopPropagation()">
+    <div class="modal-icon-danger">
+      <i class="ti ti-alert-triangle"></i>
+    </div>
+    <h2>Supprimer cette catégorie ?</h2>
+    <p class="page-subtitle">Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" (click)="annulerSuppression()">Annuler</button>
+      <button type="button" class="btn-danger" (click)="confirmerSuppression()">Supprimer</button>
+    </div>
+  </div>
+</div>
