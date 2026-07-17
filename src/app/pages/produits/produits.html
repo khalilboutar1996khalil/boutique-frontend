@@ -1,1 +1,101 @@
-<p>produits. works!</p>
+<div class="produits-page">
+  <div class="page-header">
+    <div>
+      <h1>Produits</h1>
+      <p class="page-subtitle">Gérez votre catalogue de produits</p>
+    </div>
+    <button class="btn-primary" (click)="ouvrirFormulaireCreation()">
+      <i class="ti ti-plus"></i> Nouveau produit
+    </button>
+  </div>
+
+  <div class="card">
+    <table class="tableau">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Catégorie</th>
+          <th>Prix</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let produit of produits()">
+          <td class="nom-produit">{{ produit.nom }}</td>
+          <td>{{ produit.categorieNom }}</td>
+          <td>{{ produit.prix }} TND</td>
+          <td>
+            <span [ngClass]="produit.stock < 5 ? 'badge badge-danger' : 'badge badge-success'">
+              {{ produit.stock }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn-icon" (click)="ouvrirFormulaireEdition(produit)">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-icon btn-icon-danger" (click)="supprimer(produit.id)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="produits().length === 0">
+      <i class="ti ti-box"></i>
+      <span>Aucun produit pour le moment</span>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" *ngIf="afficherFormulaire()" (click)="fermerFormulaire()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="ti ti-box" style="color: #185FA5; font-size: 22px;"></i>
+        {{ produitEnEdition ? 'Modifier le produit' : 'Nouveau produit' }}
+      </h2>
+      <button class="btn-close" (click)="fermerFormulaire()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="alerte" *ngIf="messageErreur()">
+      <i class="ti ti-alert-triangle"></i>
+      <span>{{ messageErreur() }}</span>
+    </div>
+    <form (ngSubmit)="enregistrer()">
+      <div class="champ">
+        <label>Nom du produit</label>
+        <input type="text" [(ngModel)]="nom" name="nom" placeholder="Laptop Dell" required>
+      </div>
+
+      <div class="champ-row">
+        <div class="champ">
+          <label>Prix (TND)</label>
+          <input type="number" [(ngModel)]="prix" name="prix" placeholder="0" required min="0">
+        </div>
+        <div class="champ">
+          <label>Stock</label>
+          <input type="number" [(ngModel)]="stock" name="stock" placeholder="0" required min="0">
+        </div>
+      </div>
+
+      <div class="champ">
+        <label>Catégorie</label>
+        <select [(ngModel)]="categorieId" name="categorieId" required>
+          <option [value]="0" disabled>Sélectionner une catégorie</option>
+          <option *ngFor="let categorie of categories()" [value]="categorie.id">
+            {{ categorie.nom }}
+          </option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
+        <button type="submit" class="btn-primary">
+          {{ produitEnEdition ? 'Modifier' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
