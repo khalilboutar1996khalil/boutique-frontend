@@ -4,7 +4,7 @@
       <h1>Catégories</h1>
       <p class="page-subtitle">Gérez les catégories de vos produits</p>
     </div>
-    <button class="btn-primary" (click)="ouvrirAjout()">
+    <button class="btn-primary" (click)="ouvrirFormulaireCreation()">
       <i class="ti ti-plus"></i> Nouvelle catégorie
     </button>
   </div>
@@ -33,7 +33,7 @@
           <td class="cell-nom">{{ categorie.nom }}</td>
           <td class="cell-description">{{ categorie.description }}</td>
           <td class="col-actions">
-            <button class="btn-icon" title="Modifier" (click)="ouvrirEdition(categorie)">
+            <button class="btn-icon" title="Modifier" (click)="ouvrirFormulaireEdition(categorie)">
               <i class="ti ti-edit"></i>
             </button>
             <button class="btn-icon btn-icon-danger" title="Supprimer" (click)="demanderSuppression(categorie.id)">
@@ -46,11 +46,11 @@
   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="afficherFormulaire" (click)="fermerFormulaire()">
+<div class="modal-overlay" *ngIf="afficherFormulaire()" (click)="fermerFormulaire()">
   <div class="modal-box" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
-      <h2>{{ modeEdition ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
+      <h2>{{ categorieEnEdition ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
       <button class="btn-close" (click)="fermerFormulaire()">
         <i class="ti ti-x"></i>
       </button>
@@ -62,12 +62,12 @@
     <form (ngSubmit)="enregistrer()">
       <div class="champ">
         <label>Nom</label>
-        <input type="text" [(ngModel)]="categorieEnCours.nom" name="nom" placeholder="Ex : Vêtements" required>
+        <input type="text" [(ngModel)]="nom" name="nom" placeholder="Ex : Vêtements" required>
       </div>
 
       <div class="champ">
         <label>Description</label>
-        <textarea [(ngModel)]="categorieEnCours.description" name="description" rows="3"
+        <textarea [(ngModel)]="description" name="description" rows="3"
           placeholder="Description de la catégorie"></textarea>
       </div>
 
@@ -75,7 +75,7 @@
 
       <div class="modal-actions">
         <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
-        <button type="submit" class="btn-primary">{{ modeEdition ? 'Enregistrer' : 'Créer' }}</button>
+        <button type="submit" class="btn-primary">{{ categorieEnEdition ? 'Enregistrer' : 'Créer' }}</button>
       </div>
     </form>
   </div>

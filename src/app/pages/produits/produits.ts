@@ -22,6 +22,7 @@ export class Produits implements OnInit {
   produitEnEdition: number | null = null;
   afficherFormulaire = signal(false);
   messageErreur = signal('');
+  idASupprimer: number | null = null;
   constructor(
     private produitService: ProduitService,
     private categorieService: CategorieService
@@ -43,17 +44,28 @@ export class Produits implements OnInit {
     });
   }
 
-  supprimer(id: number) {
-    if (confirm('Voulez-vous vraiment supprimer ce produit ?')) {
-      this.produitService.deleteById(id).subscribe({
-        next: () => {
-          this.chargerProduits();
-        },
-        error: (error) => {
-          console.error('Erreur lors de la suppression :', error);
-        }
-      });
+  demanderSuppression(id: number): void {
+    this.idASupprimer = id;
+  }
+
+  annulerSuppression(): void {
+    this.idASupprimer = null;
+  }
+
+  confirmerSuppression(): void {
+    if (this.idASupprimer === null) {
+      return;
     }
+    this.produitService.deleteById(this.idASupprimer).subscribe({
+      next: () => {
+        this.idASupprimer = null;
+        this.chargerProduits();
+      },
+      error: (error) => {
+        console.error('Erreur lors de la suppression du produit :', error);
+        this.idASupprimer = null;
+      }
+    });
   }
   ouvrirFormulaireCreation() {
     this.produitEnEdition = null;

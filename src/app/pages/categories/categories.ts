@@ -15,11 +15,11 @@ export class Categories implements OnInit {
   categories = signal<Categorie[]>([]);
   chargement = signal<boolean>(true);
 
-  afficherFormulaire = false;
-  modeEdition = false;
-  categorieEnCours: { id: number | null; nom: string; description: string } = { id: null, nom: '', description: '' };
-
-messageErreur = signal('');
+  nom: string = '';
+  description: string = '';
+  categorieEnEdition: number | null = null;
+  afficherFormulaire = signal(false);
+  messageErreur = signal('');
   idASupprimer: number | null = null;
 
   constructor(private categorieService: CategorieService) { }
@@ -42,32 +42,35 @@ messageErreur = signal('');
     });
   }
 
-  ouvrirAjout(): void {
-    this.modeEdition = false;
-    this.categorieEnCours = { id: null, nom: '', description: '' };
+  ouvrirFormulaireCreation(): void {
+    this.categorieEnEdition = null;
+    this.nom = '';
+    this.description = '';
     this.messageErreur.set('');
-    this.afficherFormulaire = true;
+    this.afficherFormulaire.set(true);
   }
 
-  ouvrirEdition(categorie: Categorie): void {
-    this.modeEdition = true;
-    this.categorieEnCours = { id: categorie.id, nom: categorie.nom, description: categorie.description };
+  ouvrirFormulaireEdition(categorie: Categorie): void {
+    this.categorieEnEdition = categorie.id;
+    this.nom = categorie.nom;
+    this.description = categorie.description;
     this.messageErreur.set('');
-    this.afficherFormulaire = true;
+    this.afficherFormulaire.set(true);
   }
 
   fermerFormulaire(): void {
-    this.afficherFormulaire = false;
+    this.afficherFormulaire.set(false);
   }
 
   enregistrer(): void {
-    const payload = { nom: this.categorieEnCours.nom, description: this.categorieEnCours.description };
+    const dto = { nom: this.nom, description: this.description };
+    this.messageErreur.set('');
 
-    if (this.modeEdition && this.categorieEnCours.id !== null) {
-      this.categorieService.update(this.categorieEnCours.id, payload).subscribe({
+    if (this.categorieEnEdition !== null) {
+      this.categorieService.update(this.categorieEnEdition, dto).subscribe({
         next: () => {
-          this.afficherFormulaire = false;
           this.chargerCategories();
+          this.fermerFormulaire();
         },
         error: (error) => {
           console.error('Erreur lors de la modification de la catégorie :', error);
@@ -75,10 +78,10 @@ messageErreur = signal('');
         }
       });
     } else {
-      this.categorieService.save(payload).subscribe({
+      this.categorieService.save(dto).subscribe({
         next: () => {
-          this.afficherFormulaire = false;
           this.chargerCategories();
+          this.fermerFormulaire();
         },
         error: (error) => {
           console.error('Erreur lors de la création de la catégorie :', error);

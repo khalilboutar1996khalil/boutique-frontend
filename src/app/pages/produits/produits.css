@@ -164,6 +164,17 @@
   align-items: center;
   justify-content: center;
   z-index: 100;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .modal {
@@ -174,6 +185,60 @@
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.2s ease-out;
+}
+
+.modal-confirm {
+  text-align: center;
+}
+
+.modal-confirm h2 {
+  font-size: 19px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.modal-confirm .page-subtitle {
+  margin-bottom: 24px;
+}
+
+.modal-icon-danger {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #FCEBEB;
+  color: #A32D2D;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.btn-danger {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #C0392B;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: #a02d20;
 }
 
 .modal-header {
