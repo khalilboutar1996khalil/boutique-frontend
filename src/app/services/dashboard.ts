@@ -9,7 +9,8 @@ import { DashboardStats } from '../models/DashboardStats';
 })
 export class DashboardService {
 
-  private apiUrl = 'https://boutique-springboot.onrender.com/api/dashboard';
+  //private apiUrl = 'https://boutique-springboot.onrender.com/api/dashboard';
+  private apiUrl = 'http://localhost:8080/api/dashboard';
 
   constructor(private http: HttpClient) { }
 

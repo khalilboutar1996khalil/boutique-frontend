@@ -8,7 +8,8 @@ import { Categorie } from '../models/categorie';
 })
 export class CategorieService {
 
-  private apiUrl = 'https://boutique-springboot.onrender.com/api/categories';
+  //private apiUrl = 'https://boutique-springboot.onrender.com/api/categories';
+  private apiUrl = 'http://localhost:8080/api/categories';
 
   constructor(private http: HttpClient) { }
 

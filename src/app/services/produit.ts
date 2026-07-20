@@ -8,8 +8,8 @@ import { Produit } from '../models/produit';
 })
 export class ProduitService {
 
-  private apiUrl = 'https://boutique-springboot.onrender.com/api/produits';
-
+  //private apiUrl = 'https://boutique-springboot.onrender.com/api/produits';
+  private apiUrl = 'http://localhost:8080/api/produits';
   constructor(private http: HttpClient) { }
 
   findAll(): Observable<Produit[]> {

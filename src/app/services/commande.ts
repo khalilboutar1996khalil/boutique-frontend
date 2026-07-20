@@ -8,7 +8,8 @@ import { Commande, HistoriqueStatut } from '../models/commande';
 })
 export class CommandeService {
 
-  private apiUrl = 'https://boutique-springboot.onrender.com/api/commandes';
+  //private apiUrl = 'https://boutique-springboot.onrender.com/api/commandes';
+  private apiUrl = 'http://localhost:8080/api/commandes';
 
   constructor(private http: HttpClient) { }
 

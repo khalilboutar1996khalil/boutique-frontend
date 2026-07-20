@@ -8,8 +8,8 @@ import { Client } from '../models/client';
 })
 export class ClientService {
 
-  private apiUrl = 'https://boutique-springboot.onrender.com/api/clients';
-
+  //private apiUrl = 'https://boutique-springboot.onrender.com/api/clients';
+  private apiUrl = 'http://localhost:8080/api/clients';
   constructor(private http: HttpClient) { }
 
   findAll(): Observable<Client[]> {

@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'https://boutique-springboot.onrender.com/api/auth';
-
+  //private apiUrl = 'https://boutique-springboot.onrender.com/api/auth';
+  private apiUrl = 'http://localhost:8080/api/auth';
   constructor(private httpClient: HttpClient) { }
 
   login(dto: LoginDTO): Observable<AuthResponse> {

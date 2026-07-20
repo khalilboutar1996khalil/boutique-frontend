@@ -1,22 +1,24 @@
 <div class="dashboard">
-  <div class="page-header">
-    <h1>Dashboard</h1>
-    <p class="page-subtitle">Vue d'ensemble de votre boutique</p>
+  <div class="page-header" *ngIf="stats()">
+    <h1>Bonjour, {{ username() || 'Gérant' }} 👋</h1>
+    <p class="page-subtitle">Voici l'état d'activité de votre boutique aujourd'hui.</p>
   </div>
 
   <div class="stats-grid" *ngIf="stats()">
+    <!-- Card CA -->
     <div class="stat-card">
-      <div class="stat-icon icon-green">
+      <div class="stat-icon-wrapper icon-green">
         <i class="ti ti-currency-dollar"></i>
       </div>
       <div class="stat-info">
         <span class="stat-label">Chiffre d'affaires</span>
-        <span class="stat-value">{{ stats()!.chiffreAffaires }} TND</span>
+        <span class="stat-value">{{ stats()!.chiffreAffaires | number:'1.2-2' }} TND</span>
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon icon-blue">
+    <!-- Card Commandes -->
+    <div class="stat-card" [routerLink]="['/commandes']">
+      <div class="stat-icon-wrapper icon-blue">
         <i class="ti ti-shopping-cart"></i>
       </div>
       <div class="stat-info">
@@ -25,8 +27,9 @@
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon icon-purple">
+    <!-- Card Clients -->
+    <div class="stat-card" [routerLink]="['/clients']">
+      <div class="stat-icon-wrapper icon-purple">
         <i class="ti ti-users"></i>
       </div>
       <div class="stat-info">
@@ -35,8 +38,9 @@
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon icon-orange">
+    <!-- Card Produits -->
+    <div class="stat-card" [routerLink]="['/produits']">
+      <div class="stat-icon-wrapper icon-orange">
         <i class="ti ti-box"></i>
       </div>
       <div class="stat-info">
@@ -46,51 +50,214 @@
     </div>
   </div>
 
-  <div class="two-col" *ngIf="stats()">
-    <div class="card">
-      <div class="card-title">Commandes par statut</div>
-      <div class="statut-list">
-        <div class="statut-row">
-          <span class="statut-dot dot-warning"></span>
-          <span class="statut-label">En attente</span>
-          <span class="statut-value">{{ stats()!.commandesEnAttente }}</span>
+  <div class="dashboard-body" *ngIf="stats()">
+    <!-- Colonne Principale (Gauche) -->
+    <div class="main-column">
+      <!-- Évolution des ventes (Bar Chart) -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Évolution des ventes (6 derniers mois)</h2>
         </div>
-        <div class="statut-row">
-          <span class="statut-dot dot-success"></span>
-          <span class="statut-label">Confirmées</span>
-          <span class="statut-value">{{ stats()!.commandesConfirmees }}</span>
+        <div class="bar-chart-container">
+          <div class="y-axis-lines">
+            <div class="y-line"></div>
+            <div class="y-line"></div>
+            <div class="y-line"></div>
+            <div class="y-line"></div>
+          </div>
+          <div class="chart-bars">
+            <div class="chart-bar-item" *ngFor="let sales of monthlySales()">
+              <div class="bar-wrapper">
+                <div class="bar-fill" [style.height.%]="sales.percentage">
+                  <div class="bar-tooltip">
+                    <span class="tooltip-amount">{{ sales.amount | number:'1.2-2' }} TND</span>
+                    <span class="tooltip-label">Ventes en {{ sales.label }}</span>
+                  </div>
+                </div>
+              </div>
+              <span class="bar-label">{{ sales.label }}</span>
+            </div>
+          </div>
         </div>
-        <div class="statut-row">
-          <span class="statut-dot dot-info"></span>
-          <span class="statut-label">Livrées</span>
-          <span class="statut-value">{{ stats()!.commandesLivrees }}</span>
+      </div>
+
+      <!-- Section Commandes Récentes avec filtres -->
+      <div class="card">
+        <div class="card-header-with-filters">
+          <div class="card-header">
+            <h2 class="card-title">Commandes récentes</h2>
+            <button class="btn-text-link" [routerLink]="['/commandes']">Voir tout</button>
+          </div>
+          <div class="filter-bar">
+            <div class="search-wrapper">
+              <i class="ti ti-search search-icon"></i>
+              <input type="text" placeholder="Rechercher par client..." (input)="onSearchChange($event)">
+            </div>
+            <div class="select-wrapper">
+              <select (change)="onStatusChange($event)">
+                <option value="TOUS">Tous les statuts</option>
+                <option value="EN_ATTENTE">En attente</option>
+                <option value="CONFIRMEE">Confirmée</option>
+                <option value="LIVREE">Livrée</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cmd of filteredCommandes()">
+                <td>
+                  <div class="client-cell">
+                    <div class="client-avatar">{{ cmd.clientNom.charAt(0).toUpperCase() }}</div>
+                    <span class="client-name">{{ cmd.clientNom }}</span>
+                  </div>
+                </td>
+                <td class="font-semibold">{{ cmd.montantTotal | number:'1.2-2' }} TND</td>
+                <td class="text-muted">{{ cmd.dateCommande | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <span class="badge-status" 
+                    [class.badge-waiting]="cmd.statut === 'EN_ATTENTE'"
+                    [class.badge-success]="cmd.statut === 'CONFIRMEE'" 
+                    [class.badge-info]="cmd.statut === 'LIVREE'">
+                    <span class="status-dot"></span>
+                    {{ cmd.statut === 'EN_ATTENTE' ? 'En attente' : (cmd.statut === 'CONFIRMEE' ? 'Confirmée' : 'Livrée') }}
+                  </span>
+                </td>
+                <td class="text-right">
+                  <button class="btn-action-icon" [routerLink]="['/commandes', cmd.id]">
+                    <i class="ti ti-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="empty-state" *ngIf="filteredCommandes().length === 0">
+          <i class="ti ti-shopping-cart"></i>
+          <span>Aucune commande ne correspond aux filtres</span>
+        </div>
+      </div>
+
+      <!-- Section Actions Rapides -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Actions rapides</h2>
+        </div>
+        <div class="shortcuts-grid">
+          <div class="shortcut-item" [routerLink]="['/commandes']">
+            <div class="shortcut-icon sh-blue">
+              <i class="ti ti-plus"></i>
+            </div>
+            <div class="shortcut-info">
+              <span class="shortcut-title">Nouvelle commande</span>
+              <span class="shortcut-desc">Passer une commande client</span>
+            </div>
+            <i class="ti ti-chevron-right shortcut-chevron"></i>
+          </div>
+
+          <div class="shortcut-item" [routerLink]="['/produits']">
+            <div class="shortcut-icon sh-green">
+              <i class="ti ti-package"></i>
+            </div>
+            <div class="shortcut-info">
+              <span class="shortcut-title">Ajouter un produit</span>
+              <span class="shortcut-desc">Créer une fiche produit</span>
+            </div>
+            <i class="ti ti-chevron-right shortcut-chevron"></i>
+          </div>
+
+          <div class="shortcut-item" [routerLink]="['/clients']">
+            <div class="shortcut-icon sh-purple">
+              <i class="ti ti-user-plus"></i>
+            </div>
+            <div class="shortcut-info">
+              <span class="shortcut-title">Nouveau client</span>
+              <span class="shortcut-desc">Enregistrer un client</span>
+            </div>
+            <i class="ti ti-chevron-right shortcut-chevron"></i>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Répartition visuelle</div>
-      <div class="bar-chart">
-        <div class="bar-row">
-          <span class="bar-label">Attente</span>
-          <div class="bar-track">
-            <div class="bar-fill fill-warning" [style.width.%]="(stats()!.commandesEnAttente / stats()!.totalCommandes) * 100"></div>
-          </div>
-          <span class="bar-count">{{ stats()!.commandesEnAttente }}</span>
+    <!-- Colonne Secondaire (Droite) -->
+    <div class="side-column">
+      <!-- Répartition des commandes (Donut Chart SVG) -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Répartition des commandes</h2>
         </div>
-        <div class="bar-row">
-          <span class="bar-label">Confirmée</span>
-          <div class="bar-track">
-            <div class="bar-fill fill-success" [style.width.%]="(stats()!.commandesConfirmees / stats()!.totalCommandes) * 100"></div>
+        
+        <div class="donut-chart-container" *ngIf="stats()!.totalCommandes > 0">
+          <div class="donut-svg-wrapper">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle class="donut-track" cx="50" cy="50" r="40" stroke="#f1f5f9" stroke-width="8" fill="transparent"/>
+              <circle *ngFor="let seg of donutSegments()"
+                [class]="'donut-segment ' + seg.class"
+                cx="50"
+                cy="50"
+                r="40"
+                fill="transparent"
+                stroke-width="8"
+                [attr.stroke-dasharray]="seg.strokeDasharray"
+                [attr.stroke-dashoffset]="seg.strokeDashoffset"
+              />
+            </svg>
+            <div class="donut-center-text">
+              <span class="donut-total-count">{{ stats()!.totalCommandes }}</span>
+              <span class="donut-total-label">Commandes</span>
+            </div>
           </div>
-          <span class="bar-count">{{ stats()!.commandesConfirmees }}</span>
+          
+          <div class="donut-legend">
+            <div class="legend-item" *ngFor="let seg of donutSegments()">
+              <span class="legend-dot" [style.background-color]="seg.color"></span>
+              <span class="legend-label">{{ seg.label }}</span>
+              <span class="legend-value">{{ seg.count }} ({{ seg.percentage }}%)</span>
+            </div>
+          </div>
         </div>
-        <div class="bar-row">
-          <span class="bar-label">Livrée</span>
-          <div class="bar-track">
-            <div class="bar-fill fill-info" [style.width.%]="(stats()!.commandesLivrees / stats()!.totalCommandes) * 100"></div>
+
+        <div class="empty-state" *ngIf="stats()!.totalCommandes === 0">
+          <i class="ti ti-chart-pie"></i>
+          <span>Aucune commande pour générer la répartition</span>
+        </div>
+      </div>
+
+      <!-- Alertes de stock -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Alertes de stock</h2>
+        </div>
+        
+        <div class="stock-alert-list" *ngIf="lowStockProduits().length > 0">
+          <div class="stock-alert-item" *ngFor="let prod of lowStockProduits()" [routerLink]="['/produits']">
+            <div class="stock-prod-info">
+              <span class="stock-prod-name">{{ prod.nom }}</span>
+              <span class="stock-prod-cat">{{ prod.categorieNom }}</span>
+            </div>
+            <div class="stock-badge" [class.stock-empty]="prod.stock === 0" [class.stock-warning]="prod.stock > 0">
+              {{ prod.stock === 0 ? 'Rupture' : prod.stock + ' restants' }}
+            </div>
           </div>
-          <span class="bar-count">{{ stats()!.commandesLivrees }}</span>
+        </div>
+
+        <div class="stock-success" *ngIf="lowStockProduits().length === 0">
+          <div class="success-icon-wrapper">
+            <i class="ti ti-circle-check"></i>
+          </div>
+          <span>Tous les produits sont en stock suffisant !</span>
         </div>
       </div>
     </div>
