@@ -13,6 +13,11 @@
       <div class="stat-info">
         <span class="stat-label">Chiffre d'affaires</span>
         <span class="stat-value">{{ stats()!.chiffreAffaires | number:'1.2-2' }} TND</span>
+        <span class="stat-trend" *ngIf="periodComparison() as comp"
+          [class.trend-up]="comp.caVariation >= 0" [class.trend-down]="comp.caVariation < 0">
+          <i class="ti" [class.ti-trending-up]="comp.caVariation >= 0" [class.ti-trending-down]="comp.caVariation < 0"></i>
+          {{ comp.caVariation >= 0 ? '+' : '' }}{{ comp.caVariation }}% vs mois dernier
+        </span>
       </div>
     </div>
 
@@ -24,6 +29,11 @@
       <div class="stat-info">
         <span class="stat-label">Commandes</span>
         <span class="stat-value">{{ stats()!.totalCommandes }}</span>
+        <span class="stat-trend" *ngIf="periodComparison() as comp"
+          [class.trend-up]="comp.commandesVariation >= 0" [class.trend-down]="comp.commandesVariation < 0">
+          <i class="ti" [class.ti-trending-up]="comp.commandesVariation >= 0" [class.ti-trending-down]="comp.commandesVariation < 0"></i>
+          {{ comp.commandesVariation >= 0 ? '+' : '' }}{{ comp.commandesVariation }}% vs mois dernier
+        </span>
       </div>
     </div>
 
@@ -86,7 +96,12 @@
         <div class="card-header-with-filters">
           <div class="card-header">
             <h2 class="card-title">Commandes récentes</h2>
-            <button class="btn-text-link" [routerLink]="['/commandes']">Voir tout</button>
+            <div class="header-actions">
+              <button class="btn-text-link" (click)="exporterCommandes()" [disabled]="filteredCommandes().length === 0">
+                <i class="ti ti-download"></i> Exporter
+              </button>
+              <button class="btn-text-link" [routerLink]="['/commandes']">Voir tout</button>
+            </div>
           </div>
           <div class="filter-bar">
             <div class="search-wrapper">
@@ -263,7 +278,15 @@
     </div>
   </div>
 
-  <div class="loading-state" *ngIf="!stats()">
+  <div class="error-state" *ngIf="!stats() && statsError()">
+    <i class="ti ti-alert-triangle"></i>
+    <span>Impossible de charger les statistiques du tableau de bord.</span>
+    <button class="btn-retry" (click)="chargerStats()">
+      <i class="ti ti-refresh"></i> Réessayer
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="!stats() && !statsError()">
     <i class="ti ti-loader-2 spin"></i>
     <span>Chargement des statistiques...</span>
   </div>

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,19 +12,23 @@ import { CommonModule } from '@angular/common';
   styleUrl: './login.css'
 })
 
-export class Login {
+export class Login implements OnInit {
 
   username: string = ''
   password: string = ''
   messageErreur: string = ''
 
-  constructor(private route: Router, private authService: AuthService) { }
+  constructor(private route: Router, private authService: AuthService, private activatedRoute: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    if (this.activatedRoute.snapshot.queryParamMap.get('sessionExpiree')) {
+      this.messageErreur = 'Votre session a expiré ou votre compte est introuvable. Veuillez vous reconnecter.';
+    }
+  }
 
   seConnecter() {
     this.authService.login({ username: this.username, password: this.password }).subscribe({
       next: (response) => {
-        console.log("ffffffffffffffffffffffffffffff");
-
         this.authService.sauvegarderToken(response);
         this.route.navigate(['/dashboard']);
       },

@@ -18,6 +18,7 @@ import { RouterLink } from '@angular/router';
 export class Dashboard implements OnInit {
 
   stats = signal<DashboardStats | null>(null);
+  statsError = signal<boolean>(false);
   username = signal<string | null>(null);
   allCommandes = signal<Commande[]>([]);
   lowStockProduits = signal<Produit[]>([]);
@@ -51,7 +52,7 @@ export class Dashboard implements OnInit {
   // Computed signal for last 6 months sales evolution
   monthlySales = computed(() => {
     const list = this.allCommandes();
-    const monthsData: { label: string; monthIndex: number; year: number; amount: number; percentage: number }[] = [];
+    const monthsData: { label: string; monthIndex: number; year: number; amount: number; count: number; percentage: number }[] = [];
 
     const today = new Date();
     // Generate last 6 months
@@ -64,6 +65,7 @@ export class Dashboard implements OnInit {
         monthIndex: d.getMonth(),
         year: d.getFullYear(),
         amount: 0,
+        count: 0,
         percentage: 0
       });
     }
@@ -78,6 +80,7 @@ export class Dashboard implements OnInit {
       const bucket = monthsData.find(b => b.monthIndex === m && b.year === y);
       if (bucket) {
         bucket.amount += cmd.montantTotal || 0;
+        bucket.count += 1;
       }
     });
 
@@ -88,6 +91,25 @@ export class Dashboard implements OnInit {
     });
 
     return monthsData;
+  });
+
+  // Computed signal comparing the current month to the previous one (CA & nombre de commandes)
+  periodComparison = computed(() => {
+    const months = this.monthlySales();
+    if (months.length < 2) return null;
+
+    const moisActuel = months[months.length - 1];
+    const moisPrecedent = months[months.length - 2];
+
+    const calculerVariation = (actuel: number, precedent: number): number => {
+      if (precedent === 0) return actuel > 0 ? 100 : 0;
+      return Math.round(((actuel - precedent) / precedent) * 100);
+    };
+
+    return {
+      caVariation: calculerVariation(moisActuel.amount, moisPrecedent.amount),
+      commandesVariation: calculerVariation(moisActuel.count, moisPrecedent.count)
+    };
   });
 
   // Computed signal for donut chart SVG segments
@@ -143,12 +165,14 @@ export class Dashboard implements OnInit {
   }
 
   chargerStats() {
+    this.statsError.set(false);
     this.dashboardService.getStats().subscribe({
       next: (stats) => {
         this.stats.set(stats);
       },
       error: (error) => {
         console.error('Erreur stats dashboard :', error);
+        this.statsError.set(true);
       }
     });
   }
@@ -182,5 +206,41 @@ export class Dashboard implements OnInit {
   onStatusChange(event: Event) {
     const val = (event.target as HTMLSelectElement).value;
     this.statusFilter.set(val);
+  }
+
+  exporterCommandes(): void {
+    const query = this.searchQuery().toLowerCase().trim();
+    const status = this.statusFilter();
+    let list = this.allCommandes();
+
+    if (query) {
+      list = list.filter(c => c.clientNom && c.clientNom.toLowerCase().includes(query));
+    }
+    if (status !== 'TOUS') {
+      list = list.filter(c => c.statut === status);
+    }
+
+    if (list.length === 0) return;
+
+    const entetes = ['Client', 'Montant (TND)', 'Date', 'Statut'];
+    const echapper = (valeur: string) => `"${valeur.replace(/"/g, '""')}"`;
+
+    const lignes = list.map(c => [
+      echapper(c.clientNom || ''),
+      c.montantTotal?.toFixed(2) ?? '0.00',
+      c.dateCommande ? new Date(c.dateCommande).toLocaleString('fr-FR') : '',
+      c.statut
+    ].join(';'));
+
+    const csv = [entetes.join(';'), ...lignes].join('\n');
+    const bom = '﻿';
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const lien = document.createElement('a');
+    lien.href = url;
+    lien.download = `commandes_${new Date().toISOString().slice(0, 10)}.csv`;
+    lien.click();
+    URL.revokeObjectURL(url);
   }
 }
