@@ -7,11 +7,12 @@ import { DashboardStats } from '../../models/DashboardStats';
 import { Commande } from '../../models/commande';
 import { Produit } from '../../models/produit';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -26,6 +27,15 @@ export class Dashboard implements OnInit {
   // Filter signals
   searchQuery = signal<string>('');
   statusFilter = signal<string>('TOUS');
+
+  // Vue du graphique de ventes : par mois ou par année
+  vueVentes = signal<'mois' | 'annee'>('mois');
+
+  // Objectif de vente mensuel (stocké localement, pas de champ backend pour l'instant)
+  private readonly cleObjectif = 'objectifMensuelCA';
+  objectifMensuel = signal<number>(Number(localStorage.getItem(this.cleObjectif)) || 0);
+  objectifEnEdition = signal<boolean>(false);
+  objectifSaisi: number | null = null;
 
   // Computed signal for filtered orders (returns top 5 match)
   filteredCommandes = computed(() => {
@@ -91,6 +101,78 @@ export class Dashboard implements OnInit {
     });
 
     return monthsData;
+  });
+
+  // Computed signal for sales evolution grouped by year
+  yearlySales = computed(() => {
+    const list = this.allCommandes();
+    const totauxParAnnee = new Map<number, number>();
+
+    list.forEach(cmd => {
+      if (!cmd.dateCommande) return;
+      const annee = new Date(cmd.dateCommande).getFullYear();
+      totauxParAnnee.set(annee, (totauxParAnnee.get(annee) || 0) + (cmd.montantTotal || 0));
+    });
+
+    const annees = Array.from(totauxParAnnee.keys()).sort((a, b) => a - b);
+    const maxAmount = Math.max(...annees.map(a => totauxParAnnee.get(a)!), 1);
+
+    return annees.map(annee => ({
+      label: String(annee),
+      amount: totauxParAnnee.get(annee)!,
+      percentage: Math.round((totauxParAnnee.get(annee)! / maxAmount) * 100)
+    }));
+  });
+
+  // Données affichées dans le graphique, selon la vue sélectionnée (mois/année)
+  chartData = computed(() => {
+    return this.vueVentes() === 'mois' ? this.monthlySales() : this.yearlySales();
+  });
+
+  // Computed signal for top 5 clients by total spend
+  topClients = computed(() => {
+    const totauxParClient = new Map<string, { nom: string; total: number; nbCommandes: number }>();
+
+    this.allCommandes().forEach(cmd => {
+      if (!cmd.clientNom) return;
+      const entree = totauxParClient.get(cmd.clientNom) || { nom: cmd.clientNom, total: 0, nbCommandes: 0 };
+      entree.total += cmd.montantTotal || 0;
+      entree.nbCommandes += 1;
+      totauxParClient.set(cmd.clientNom, entree);
+    });
+
+    return Array.from(totauxParClient.values())
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+  });
+
+  // Computed signal for pending orders older than the threshold (in days)
+  commandesEnAttenteAnciennes = computed(() => {
+    const seuilJours = 3;
+    const maintenant = Date.now();
+
+    return this.allCommandes()
+      .filter(cmd => {
+        if (cmd.statut !== 'EN_ATTENTE' || !cmd.dateCommande) return false;
+        const ageJours = (maintenant - new Date(cmd.dateCommande).getTime()) / (1000 * 60 * 60 * 24);
+        return ageJours >= seuilJours;
+      })
+      .sort((a, b) => new Date(a.dateCommande).getTime() - new Date(b.dateCommande).getTime());
+  });
+
+  // Computed signal for the current month's progress toward the monthly sales target
+  progressionObjectif = computed(() => {
+    const objectif = this.objectifMensuel();
+    if (objectif <= 0) return null;
+
+    const mois = this.monthlySales();
+    const caMoisActuel = mois.length > 0 ? mois[mois.length - 1].amount : 0;
+
+    return {
+      ca: caMoisActuel,
+      objectif,
+      pourcentage: Math.min(100, Math.round((caMoisActuel / objectif) * 100))
+    };
   });
 
   // Computed signal comparing the current month to the previous one (CA & nombre de commandes)
@@ -206,6 +288,27 @@ export class Dashboard implements OnInit {
   onStatusChange(event: Event) {
     const val = (event.target as HTMLSelectElement).value;
     this.statusFilter.set(val);
+  }
+
+  definirVueVentes(vue: 'mois' | 'annee'): void {
+    this.vueVentes.set(vue);
+  }
+
+  ouvrirEditionObjectif(): void {
+    this.objectifSaisi = this.objectifMensuel() || null;
+    this.objectifEnEdition.set(true);
+  }
+
+  annulerEditionObjectif(): void {
+    this.objectifEnEdition.set(false);
+  }
+
+  enregistrerObjectif(): void {
+    const valeur = this.objectifSaisi ?? 0;
+    if (valeur <= 0) return;
+    this.objectifMensuel.set(valeur);
+    localStorage.setItem(this.cleObjectif, String(valeur));
+    this.objectifEnEdition.set(false);
   }
 
   exporterCommandes(): void {

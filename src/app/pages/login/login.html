@@ -6,6 +6,11 @@
     <h1>Connexion</h1>
     <p class="sous-titre">Accédez à votre espace boutique</p>
 
+    <div class="alerte" *ngIf="messageErreur">
+      <i class="ti ti-alert-triangle"></i>
+      <span>{{ messageErreur }}</span>
+    </div>
+
     <form (ngSubmit)="seConnecter()">
       <div class="champ">
         <label>Username</label>
@@ -15,10 +20,6 @@
       <div class="champ">
         <label>Mot de passe</label>
         <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required>
-      </div>
-
-      <div class="erreur" *ngIf="messageErreur">
-        {{ messageErreur }}
       </div>
 
       <button type="submit" class="btn-full">Se connecter</button>

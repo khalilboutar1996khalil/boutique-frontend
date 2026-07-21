@@ -4,6 +4,16 @@
     <p class="page-subtitle">Voici l'état d'activité de votre boutique aujourd'hui.</p>
   </div>
 
+  <div class="pending-alert-banner" *ngIf="commandesEnAttenteAnciennes().length > 0" [routerLink]="['/commandes']">
+    <i class="ti ti-clock-exclamation"></i>
+    <span>
+      {{ commandesEnAttenteAnciennes().length }}
+      commande{{ commandesEnAttenteAnciennes().length > 1 ? 's' : '' }}
+      en attente depuis plus de 3 jours — pensez à les traiter.
+    </span>
+    <i class="ti ti-chevron-right banner-chevron"></i>
+  </div>
+
   <div class="stats-grid" *ngIf="stats()">
     <!-- Card CA -->
     <div class="stat-card">
@@ -66,7 +76,11 @@
       <!-- Évolution des ventes (Bar Chart) -->
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Évolution des ventes (6 derniers mois)</h2>
+          <h2 class="card-title">Évolution des ventes {{ vueVentes() === 'mois' ? '(6 derniers mois)' : '(par année)' }}</h2>
+          <div class="view-toggle">
+            <button class="toggle-btn" [class.active]="vueVentes() === 'mois'" (click)="definirVueVentes('mois')">Mois</button>
+            <button class="toggle-btn" [class.active]="vueVentes() === 'annee'" (click)="definirVueVentes('annee')">Année</button>
+          </div>
         </div>
         <div class="bar-chart-container">
           <div class="y-axis-lines">
@@ -76,7 +90,7 @@
             <div class="y-line"></div>
           </div>
           <div class="chart-bars">
-            <div class="chart-bar-item" *ngFor="let sales of monthlySales()">
+            <div class="chart-bar-item" *ngFor="let sales of chartData()">
               <div class="bar-wrapper">
                 <div class="bar-fill" [style.height.%]="sales.percentage">
                   <div class="bar-tooltip">
@@ -88,6 +102,10 @@
               <span class="bar-label">{{ sales.label }}</span>
             </div>
           </div>
+        </div>
+        <div class="empty-state" *ngIf="chartData().length === 0">
+          <i class="ti ti-chart-bar"></i>
+          <span>Aucune vente à afficher pour cette période</span>
         </div>
       </div>
 
@@ -247,6 +265,64 @@
         <div class="empty-state" *ngIf="stats()!.totalCommandes === 0">
           <i class="ti ti-chart-pie"></i>
           <span>Aucune commande pour générer la répartition</span>
+        </div>
+      </div>
+
+      <!-- Objectif de vente mensuel -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Objectif du mois</h2>
+          <button class="btn-text-link" (click)="ouvrirEditionObjectif()" *ngIf="!objectifEnEdition()">
+            <i class="ti ti-pencil"></i> {{ objectifMensuel() > 0 ? 'Modifier' : 'Définir' }}
+          </button>
+        </div>
+
+        <div class="objectif-edit" *ngIf="objectifEnEdition()">
+          <input type="number" min="1" step="1" placeholder="Objectif en TND" [(ngModel)]="objectifSaisi">
+          <div class="objectif-edit-actions">
+            <button class="btn-retry" (click)="enregistrerObjectif()">Enregistrer</button>
+            <button class="btn-text-link" (click)="annulerEditionObjectif()">Annuler</button>
+          </div>
+        </div>
+
+        <div class="objectif-progress" *ngIf="!objectifEnEdition() && progressionObjectif() as prog">
+          <div class="objectif-values">
+            <span class="objectif-ca">{{ prog.ca | number:'1.2-2' }} TND</span>
+            <span class="objectif-cible">/ {{ prog.objectif | number:'1.2-2' }} TND</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="prog.pourcentage" [class.progress-complete]="prog.pourcentage >= 100"></div>
+          </div>
+          <span class="objectif-pourcentage">{{ prog.pourcentage }}% atteint</span>
+        </div>
+
+        <div class="empty-state" *ngIf="!objectifEnEdition() && !progressionObjectif()">
+          <i class="ti ti-target-arrow"></i>
+          <span>Aucun objectif défini pour ce mois</span>
+        </div>
+      </div>
+
+      <!-- Top 5 clients -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Top 5 clients</h2>
+        </div>
+
+        <div class="top-clients-list" *ngIf="topClients().length > 0">
+          <div class="top-client-item" *ngFor="let client of topClients(); let i = index">
+            <span class="top-client-rank">{{ i + 1 }}</span>
+            <div class="client-avatar">{{ client.nom.charAt(0).toUpperCase() }}</div>
+            <div class="top-client-info">
+              <span class="top-client-name">{{ client.nom }}</span>
+              <span class="top-client-count">{{ client.nbCommandes }} commande{{ client.nbCommandes > 1 ? 's' : '' }}</span>
+            </div>
+            <span class="top-client-total">{{ client.total | number:'1.2-2' }} TND</span>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="topClients().length === 0">
+          <i class="ti ti-users"></i>
+          <span>Aucun client pour l'instant</span>
         </div>
       </div>
 

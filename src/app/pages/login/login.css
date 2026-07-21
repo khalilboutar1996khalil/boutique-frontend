@@ -134,14 +134,24 @@ h1 {
   transform: translateY(-1px);
 }
 
-.erreur {
-  background: #FCEBEB;
-  color: #A32D2D;
+.alerte {
+  background: #FEF9E7;
+  border: 1px solid #F5D897;
+  color: #854F0B;
   font-size: 13px;
   padding: 12px 16px;
   border-radius: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   animation: shake 0.4s ease;
+}
+
+.alerte i {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 @keyframes shake {

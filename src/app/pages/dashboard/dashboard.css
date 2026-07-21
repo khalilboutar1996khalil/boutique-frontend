@@ -27,6 +27,43 @@
   font-weight: 500;
 }
 
+/* Pending orders alert banner */
+.pending-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #92400e;
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: slideUp 0.4s ease-out;
+}
+
+.pending-alert-banner:hover {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.pending-alert-banner i:first-child {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.pending-alert-banner span {
+  flex: 1;
+}
+
+.banner-chevron {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
 /* Stats grid cards & animations */
 .stats-grid {
   display: grid;
@@ -313,6 +350,33 @@
   background: #ffffff;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Sales chart view toggle (Mois / Année) */
+.view-toggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.toggle-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: #ffffff;
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Y-Axis and Bars for custom Bar Chart */
@@ -820,6 +884,149 @@
   font-weight: 700;
   color: var(--text-main);
   font-size: 12px;
+}
+
+/* Objectif de vente mensuel */
+.objectif-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.objectif-edit input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: var(--text-main);
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.objectif-edit input:focus {
+  background: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.objectif-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.objectif-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.objectif-values {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.objectif-ca {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.objectif-cible {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--primary-color), #818cf8);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-fill.progress-complete {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.objectif-pourcentage {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Top 5 clients widget */
+.top-clients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-client-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.top-client-item:hover {
+  border-color: rgba(99, 102, 241, 0.25);
+  background: rgba(99, 102, 241, 0.02);
+}
+
+.top-client-rank {
+  width: 20px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.top-client-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.top-client-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-client-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.top-client-total {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  flex-shrink: 0;
 }
 
 /* Stock Alerts widget with subtle shake/bounce */
