@@ -1,40 +1,51 @@
-<div class="clients">
+<div class="clients-page">
   <div class="page-header">
     <div>
       <h1>Clients</h1>
-      <p class="page-subtitle">Gérez votre base de clients</p>
+      <p class="page-subtitle">Gérez et suivez le répertoire de vos clients.</p>
     </div>
     <button class="btn-primary" (click)="ouvrirFormulaireCreation()">
-      <i class="ti ti-plus"></i> Nouveau client
+      <i class="ti ti-user-plus"></i> Nouveau client
     </button>
+  </div>
+
+  <div class="filter-controls-card">
+    <div class="search-input-wrapper">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" placeholder="Rechercher un client par nom, email ou téléphone..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+    </div>
+  </div>
+
+  <div class="results-meta" *ngIf="!chargement()">
+    <span>Affichage de <strong>{{ filteredClients().length }}</strong> client(s)</span>
   </div>
 
   <div class="loading-state" *ngIf="chargement()">
     <i class="ti ti-loader-2 spin"></i>
-    <span>Chargement des clients...</span>
+    <span>Chargement de la liste des clients...</span>
   </div>
 
-  <div class="card" *ngIf="!chargement()">
-    <div class="empty-state" *ngIf="clients().length === 0">
-      <i class="ti ti-users"></i>
-      <span>Aucun client pour le moment</span>
-    </div>
-
-    <table class="tableau" *ngIf="clients().length > 0">
+  <div class="card table-card" *ngIf="!chargement() && filteredClients().length > 0">
+    <table class="tableau">
       <thead>
         <tr>
-          <th>Nom</th>
+          <th>Client</th>
           <th>Email</th>
           <th>Téléphone</th>
-          <th class="col-actions">Actions</th>
+          <th class="text-right">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let client of clients()">
-          <td class="cell-nom">{{ client.nom }}</td>
-          <td>{{ client.email }}</td>
-          <td>{{ client.telephone }}</td>
-          <td class="col-actions">
+        <tr *ngFor="let client of filteredClients()">
+          <td>
+            <div class="client-cell">
+              <div class="client-avatar">{{ client.nom.charAt(0).toUpperCase() }}</div>
+              <span class="cell-nom">{{ client.nom }}</span>
+            </div>
+          </td>
+          <td class="text-muted"><i class="ti ti-mail"></i> {{ client.email }}</td>
+          <td class="text-muted"><i class="ti ti-phone"></i> {{ client.telephone }}</td>
+          <td class="col-actions text-right">
             <button class="btn-icon" title="Modifier" (click)="ouvrirFormulaireEdition(client)">
               <i class="ti ti-edit"></i>
             </button>
@@ -46,55 +57,71 @@
       </tbody>
     </table>
   </div>
+
+  <div class="card empty-card" *ngIf="!chargement() && filteredClients().length === 0">
+    <i class="ti ti-users"></i>
+    <h3>Aucun client trouvé</h3>
+    <p>Aucun client ne correspond à votre recherche.</p>
+  </div>
 </div>
 
+<!-- Modal Form -->
 <div class="modal-overlay" *ngIf="afficherFormulaire()" (click)="fermerFormulaire()">
-  <div class="modal-box" (click)="$event.stopPropagation()">
-
+  <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>{{ clientEnEdition ? 'Modifier le client' : 'Nouveau client' }}</h2>
+      <h2>
+        <i class="ti ti-user modal-header-icon"></i>
+        {{ clientEnEdition ? 'Modifier la fiche client' : 'Nouveau client' }}
+      </h2>
       <button class="btn-close" (click)="fermerFormulaire()">
         <i class="ti ti-x"></i>
       </button>
     </div>
-    <div class="alerte" *ngIf="messageErreur()">
+
+    <div class="alerte-erreur" *ngIf="messageErreur()">
       <i class="ti ti-alert-triangle"></i>
       <span>{{ messageErreur() }}</span>
     </div>
-    <form (ngSubmit)="enregistrer()">
-      <div class="champ">
-        <label>Nom</label>
-        <input type="text" [(ngModel)]="nom" name="nom" placeholder="Ex : Ahmed Ben Ali" required>
+
+    <form (ngSubmit)="enregistrer()" class="modal-form">
+      <div class="form-group">
+        <label>Nom complet</label>
+        <input type="text" class="form-control" [(ngModel)]="nom" name="nom" placeholder="ex: Ahmed Ben Ali" required />
       </div>
 
-      <div class="champ">
-        <label>Email</label>
-        <input type="email" [(ngModel)]="email" name="email" placeholder="exemple@email.com" required>
+      <div class="form-group">
+        <label>Adresse e-mail</label>
+        <input type="email" class="form-control" [(ngModel)]="email" name="email" placeholder="ahmed@exemple.tn" required />
       </div>
 
-      <div class="champ">
-        <label>Téléphone</label>
-        <input type="tel" [(ngModel)]="telephone" name="telephone" placeholder="+216 12 345 678" required>
+      <div class="form-group">
+        <label>Numéro de téléphone</label>
+        <input type="tel" class="form-control" [(ngModel)]="telephone" name="telephone" placeholder="+216 98 123 456" required />
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
-        <button type="submit" class="btn-primary">{{ clientEnEdition ? 'Enregistrer' : 'Créer' }}</button>
+        <button type="button" class="btn btn-secondary" (click)="fermerFormulaire()">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-check"></i> {{ clientEnEdition ? 'Enregistrer' : 'Créer le client' }}
+        </button>
       </div>
     </form>
   </div>
 </div>
 
+<!-- Modal Confirmation Suppression -->
 <div class="modal-overlay" *ngIf="idASupprimer !== null" (click)="annulerSuppression()">
-  <div class="modal-box modal-confirm" (click)="$event.stopPropagation()">
+  <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
     <div class="modal-icon-danger">
       <i class="ti ti-alert-triangle"></i>
     </div>
     <h2>Supprimer ce client ?</h2>
-    <p class="page-subtitle">Cette action est irréversible.</p>
+    <p class="modal-confirm-desc">Cette action est irréversible et supprimera le profil du client.</p>
     <div class="modal-actions">
-      <button type="button" class="btn-secondary" (click)="annulerSuppression()">Annuler</button>
-      <button type="button" class="btn-danger" (click)="confirmerSuppression()">Supprimer</button>
+      <button type="button" class="btn btn-secondary" (click)="annulerSuppression()">Annuler</button>
+      <button type="button" class="btn btn-danger" (click)="confirmerSuppression()">
+        <i class="ti ti-trash"></i> Supprimer
+      </button>
     </div>
   </div>
 </div>

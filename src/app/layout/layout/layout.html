@@ -1,51 +1,75 @@
-<div class="app-layout">
-  <div class="sidebar">
+<div class="app-layout" [class.collapsed]="sidebarCollapsed()">
+  <aside class="sidebar">
     <div class="logo">
-      <i class="ti ti-shopping-bag"></i>
-      <span>Boutique</span>
+      <div class="logo-icon">
+        <i class="ti ti-shopping-bag"></i>
+      </div>
+      <span class="logo-text">Boutique</span>
     </div>
 
-    <span class="nav-section">Principal</span>
+    <div class="nav-section">Principal</div>
     <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
-      <i class="ti ti-layout-dashboard"></i> Dashboard
+      <i class="ti ti-layout-dashboard"></i>
+      <span class="nav-label">Dashboard</span>
     </a>
     <a routerLink="/commandes" routerLinkActive="active" class="nav-item">
-      <i class="ti ti-shopping-cart"></i> Commandes
+      <i class="ti ti-shopping-cart"></i>
+      <span class="nav-label">Commandes</span>
     </a>
 
     <a routerLink="/produits" routerLinkActive="active" class="nav-item">
-      <i class="ti ti-box"></i> Produits
+      <i class="ti ti-box"></i>
+      <span class="nav-label">Produits</span>
     </a>
     <a routerLink="/categories" routerLinkActive="active" class="nav-item">
-      <i class="ti ti-tags"></i> Catégories
+      <i class="ti ti-tags"></i>
+      <span class="nav-label">Catégories</span>
     </a>
 
-    <span class="nav-section">Gestion</span>
+    <div class="nav-section">Gestion</div>
     <a routerLink="/clients" routerLinkActive="active" class="nav-item">
-      <i class="ti ti-users"></i> Clients
+      <i class="ti ti-users"></i>
+      <span class="nav-label">Clients</span>
     </a>
 
     <div class="nav-bottom">
-      <div class="nav-item" (click)="deconnecter()">
-        <i class="ti ti-logout"></i> Déconnexion
+      <div class="nav-item logout-btn" (click)="deconnecter()">
+        <i class="ti ti-logout"></i>
+        <span class="nav-label">Déconnexion</span>
       </div>
     </div>
-  </div>
+  </aside>
 
   <div class="main">
-    <div class="topbar">
-      <div class="topbar-title"></div>
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn sidebar-toggle" (click)="toggleSidebar()" title="Basculer le menu">
+          <i class="ti ti-menu-2"></i>
+        </button>
+      </div>
+
       <div class="topbar-actions">
-        <div class="avatar">{{ username?.charAt(0)?.toUpperCase() }}</div>
-        <div class="user-info">
-          <span class="user-name">{{ username }}</span>
-          <span class="user-role">{{ role }}</span>
+        <!-- Theme Switcher -->
+        <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="isDarkMode() ? 'Passer en mode clair' : 'Passer en mode sombre'">
+          <i class="ti" [class.ti-sun]="isDarkMode()" [class.ti-moon]="!isDarkMode()"></i>
+          <span class="theme-label">{{ isDarkMode() ? 'Clair' : 'Sombre' }}</span>
+        </button>
+
+        <div class="user-profile">
+          <div class="avatar">
+            {{ username?.charAt(0)?.toUpperCase() || 'A' }}
+            <span class="online-indicator"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-name">{{ username || 'Utilisateur' }}</span>
+            <span class="user-role-badge">{{ role || 'ADMIN' }}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <div class="content">
+    <main class="content">
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </div>
 </div>

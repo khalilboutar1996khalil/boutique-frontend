@@ -26,8 +26,9 @@ export class CommandeDetails implements OnInit {
   ngOnInit(): void {
     this.commandeId = Number(this.route.snapshot.paramMap.get('id'));
     this.chargerCommande();
-    this.chargerHistorique(); // ← bien présent ?
+    this.chargerHistorique();
   }
+
   chargerHistorique() {
     this.commandeService.getHistorique(this.commandeId).subscribe({
       next: (historique) => {
@@ -37,10 +38,10 @@ export class CommandeDetails implements OnInit {
     });
   }
 
-
   retour() {
     this.router.navigate(['/commandes']);
   }
+
   chargerCommande() {
     this.commandeService.findAll().subscribe({
       next: (commandes) => {
@@ -61,5 +62,9 @@ export class CommandeDetails implements OnInit {
 
   estActuel(statut: string): boolean {
     return this.commande()?.statut === statut;
+  }
+
+  imprimerFacture() {
+    window.print();
   }
 }

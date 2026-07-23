@@ -2,78 +2,114 @@
   <div class="page-header">
     <div>
       <h1>Commandes</h1>
-      <p class="page-subtitle">Suivez et gérez les commandes clients</p>
+      <p class="page-subtitle">Suivez, traitez et gérez les commandes clients en temps réel.</p>
     </div>
     <button class="btn-primary" (click)="ouvrirFormulaire()">
       <i class="ti ti-plus"></i> Nouvelle commande
     </button>
   </div>
 
-  <div class="card">
+  <!-- Filter & Controls Card -->
+  <div class="filter-controls-card">
+    <div class="search-input-wrapper">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" placeholder="Rechercher par client ou N° commande..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+    </div>
+
+    <div class="filter-dropdowns">
+      <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+        <option value="TOUS">Tous les statuts</option>
+        <option value="EN_ATTENTE">En attente</option>
+        <option value="CONFIRMEE">Confirmée</option>
+        <option value="LIVREE">Livrée</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="results-meta">
+    <span>Affichage de <strong>{{ filteredCommandes().length }}</strong> commande(s)</span>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="card table-card">
     <table class="tableau">
       <thead>
         <tr>
+          <th>N° Cmd</th>
           <th>Client</th>
-          <th>Montant</th>
+          <th>Montant Total</th>
           <th>Date</th>
-          <th>Statut</th>
-          <th>Statut (modifier)</th>
-          <th>Détails</th>
-
+          <th>Statut Actuel</th>
+          <th>Mettre à jour le Statut</th>
+          <th class="text-right">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let commande of commandes()">
-          <td class="nom-produit">{{ commande.clientNom }}</td>
-          <td>{{ commande.montantTotal }} TND</td>
-          <td>{{ commande.dateCommande | date:'dd/MM/yyyy' }}</td>
+        <tr *ngFor="let commande of filteredCommandes()">
+          <td class="font-bold">#{{ commande.id }}</td>
           <td>
-            <span class="badge" [class.badge-warning]="commande.statut === 'EN_ATTENTE'"
-              [class.badge-success]="commande.statut === 'CONFIRMEE'" [class.badge-info]="commande.statut === 'LIVREE'">
-              {{ commande.statut }}
+            <div class="client-cell">
+              <div class="client-avatar">{{ commande.clientNom?.charAt(0)?.toUpperCase() || 'C' }}</div>
+              <span class="nom-client">{{ commande.clientNom }}</span>
+            </div>
+          </td>
+          <td class="font-bold amount-text">{{ commande.montantTotal | number:'1.2-2' }} TND</td>
+          <td class="text-muted">{{ commande.dateCommande | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <span class="badge-status" 
+              [class.badge-waiting]="commande.statut === 'EN_ATTENTE'"
+              [class.badge-success]="commande.statut === 'CONFIRMEE'" 
+              [class.badge-info]="commande.statut === 'LIVREE'">
+              <span class="status-dot"></span>
+              {{ commande.statut === 'EN_ATTENTE' ? 'En attente' : (commande.statut === 'CONFIRMEE' ? 'Confirmée' : 'Livrée') }}
             </span>
           </td>
           <td>
-            <select class="select-statut" [value]="commande.statut"
-              (change)="changerStatut(commande.id, $any($event.target).value)">
+            <select class="select-statut-inline" [value]="commande.statut" (change)="changerStatut(commande.id, $any($event.target).value)">
               <option value="EN_ATTENTE">En attente</option>
               <option value="CONFIRMEE">Confirmée</option>
               <option value="LIVREE">Livrée</option>
             </select>
           </td>
-          <td>
-            <button class="btn-icon" [routerLink]="['/commandes', commande.id]">
-              <i class="ti ti-eye"></i>
+          <td class="actions text-right">
+            <button class="btn-action-icon" [routerLink]="['/commandes', commande.id]" title="Voir détails et facture">
+              <i class="ti ti-receipt"></i>
             </button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div class="empty-state" *ngIf="commandes().length === 0">
-      <i class="ti ti-shopping-cart"></i>
-      <span>Aucune commande pour le moment</span>
+    <div class="empty-card" *ngIf="filteredCommandes().length === 0">
+      <i class="ti ti-shopping-cart-x"></i>
+      <h3>Aucune commande trouvée</h3>
+      <p>Aucune commande ne correspond à votre recherche ou filtre.</p>
     </div>
   </div>
 </div>
+
+<!-- Modal Creation Form -->
 <div class="modal-overlay" *ngIf="afficherFormulaire()" (click)="fermerFormulaire()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Nouvelle commande</h2>
+      <h2>
+        <i class="ti ti-shopping-cart modal-header-icon"></i>
+        Nouvelle commande
+      </h2>
       <button class="btn-close" (click)="fermerFormulaire()">
         <i class="ti ti-x"></i>
       </button>
     </div>
 
-    <div class="alerte" *ngIf="messageErreur()">
+    <div class="alerte-erreur" *ngIf="messageErreur()">
       <i class="ti ti-alert-triangle"></i>
       <span>{{ messageErreur() }}</span>
     </div>
 
-    <form (ngSubmit)="passer()">
-      <div class="champ">
+    <form (ngSubmit)="passer()" class="modal-form">
+      <div class="form-group">
         <label>Client</label>
-        <select [(ngModel)]="clientId" name="clientId" required>
+        <select class="form-control" [(ngModel)]="clientId" name="clientId" required>
           <option [value]="0" disabled>Sélectionner un client</option>
           <option *ngFor="let client of clients()" [value]="client.id">
             {{ client.nom }}
@@ -81,24 +117,31 @@
         </select>
       </div>
 
-      <div class="champ">
+      <div class="form-group">
         <label>Produit</label>
-        <select [(ngModel)]="produitId" name="produitId" required>
+        <select class="form-control" [(ngModel)]="produitId" name="produitId" required>
           <option [value]="0" disabled>Sélectionner un produit</option>
           <option *ngFor="let produit of produits()" [value]="produit.id">
-            {{ produit.nom }} — {{ produit.prix }} TND
+            {{ produit.nom }} — {{ produit.prix | number:'1.2-2' }} TND (Stock: {{ produit.stock }})
           </option>
         </select>
       </div>
 
-      <div class="champ">
+      <div class="form-group">
         <label>Quantité</label>
-        <input type="number" [(ngModel)]="quantite" name="quantite" min="1" required>
+        <input type="number" class="form-control" [(ngModel)]="quantite" name="quantite" min="1" required />
+      </div>
+
+      <div class="estimation-box" *ngIf="prixEstime() > 0">
+        <span class="est-label">Total estimé :</span>
+        <span class="est-value">{{ prixEstime() | number:'1.2-2' }} TND</span>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
-        <button type="submit" class="btn-primary">Passer la commande</button>
+        <button type="button" class="btn btn-secondary" (click)="fermerFormulaire()">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-check"></i> Valider la commande
+        </button>
       </div>
     </form>
   </div>

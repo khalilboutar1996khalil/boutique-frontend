@@ -1,67 +1,144 @@
 <div class="details-page">
-  <div class="page-header">
-    <h1>Commande #{{ commandeId }}</h1>
-    <button class="btn-primary" (click)="retour()">
-      <i class="ti ti-arrow-left"></i> Retour
-    </button>
+  <div class="page-header no-print">
+    <div>
+      <h1>Commande #{{ commandeId }}</h1>
+      <p class="page-subtitle">Suivi du statut et impression de la facture officielle.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="retour()">
+        <i class="ti ti-arrow-left"></i> Retour
+      </button>
+      <button class="btn btn-primary" (click)="imprimerFacture()">
+        <i class="ti ti-printer"></i> Imprimer la Facture
+      </button>
+    </div>
   </div>
 
-  <div class="card">
+  <!-- Timeline Card -->
+  <div class="card no-print">
     <div class="card-title">Suivi de la commande</div>
     <div class="timeline">
       <div class="step">
         <div class="step-line" [class.line-active]="estComplete('CONFIRMEE')"></div>
-        <div class="circle" [class.circle-active]="estComplete('EN_ATTENTE')"
-          [class.circle-current]="estActuel('EN_ATTENTE')">
+        <div class="circle" [class.circle-active]="estComplete('EN_ATTENTE')" [class.circle-current]="estActuel('EN_ATTENTE')">
           <i class="ti ti-check" *ngIf="estComplete('EN_ATTENTE') && !estActuel('EN_ATTENTE')"></i>
-<i class="ti ti-clock" *ngIf="estActuel('EN_ATTENTE')"></i>
-<i class="ti ti-circle" *ngIf="!estComplete('EN_ATTENTE') && !estActuel('EN_ATTENTE')"></i>
+          <i class="ti ti-clock" *ngIf="estActuel('EN_ATTENTE')"></i>
+          <i class="ti ti-circle" *ngIf="!estComplete('EN_ATTENTE') && !estActuel('EN_ATTENTE')"></i>
         </div>
         <span class="lbl">Passée</span>
       </div>
 
       <div class="step">
         <div class="step-line" [class.line-active]="estComplete('LIVREE')"></div>
-        <div class="circle" [class.circle-active]="estComplete('CONFIRMEE')"
-          [class.circle-current]="estActuel('CONFIRMEE')">
-         <i class="ti ti-check" *ngIf="estComplete('CONFIRMEE') && !estActuel('CONFIRMEE')"></i>
-<i class="ti ti-hourglass" *ngIf="estActuel('CONFIRMEE')"></i>
-<i class="ti ti-circle" *ngIf="!estComplete('CONFIRMEE') && !estActuel('CONFIRMEE')"></i>
+        <div class="circle" [class.circle-active]="estComplete('CONFIRMEE')" [class.circle-current]="estActuel('CONFIRMEE')">
+          <i class="ti ti-check" *ngIf="estComplete('CONFIRMEE') && !estActuel('CONFIRMEE')"></i>
+          <i class="ti ti-hourglass" *ngIf="estActuel('CONFIRMEE')"></i>
+          <i class="ti ti-circle" *ngIf="!estComplete('CONFIRMEE') && !estActuel('CONFIRMEE')"></i>
         </div>
         <span class="lbl">Confirmée</span>
       </div>
 
       <div class="step">
         <div class="circle" [class.circle-active]="estComplete('LIVREE')" [class.circle-current]="estActuel('LIVREE')">
-         <i class="ti ti-check" *ngIf="estComplete('LIVREE') && !estActuel('LIVREE')"></i>
-<i class="ti ti-truck" *ngIf="estActuel('LIVREE')"></i>
-<i class="ti ti-circle" *ngIf="!estComplete('LIVREE') && !estActuel('LIVREE')"></i>
+          <i class="ti ti-check" *ngIf="estComplete('LIVREE') && !estActuel('LIVREE')"></i>
+          <i class="ti ti-truck" *ngIf="estActuel('LIVREE')"></i>
+          <i class="ti ti-circle" *ngIf="!estComplete('LIVREE') && !estActuel('LIVREE')"></i>
         </div>
         <span class="lbl">Livrée</span>
       </div>
     </div>
   </div>
 
-  <div class="card" *ngIf="commande()">
-    <div class="card-title">Informations de la commande</div>
-    <div class="infos-simple">
-      <div class="ligne-info">
-        <span class="cle">Client</span>
-        <span class="valeur">{{ commande()!.clientNom }}</span>
+  <!-- Official Printable Invoice -->
+  <div class="card invoice-card" *ngIf="commande()">
+    <div class="invoice-header">
+      <div class="invoice-company">
+        <div class="invoice-logo">
+          <i class="ti ti-shopping-bag"></i>
+        </div>
+        <div>
+          <h2>BOUTIQUE E-COMMERCE</h2>
+          <p>123 Avenue Habib Bourguiba, Tunis</p>
+          <p>Tél: +216 71 000 000 | Email: contact@boutique.tn</p>
+        </div>
       </div>
-      <div class="ligne-info">
-        <span class="cle">Montant</span>
-        <span class="valeur valeur-montant">{{ commande()!.montantTotal }} TND</span>
+
+      <div class="invoice-meta">
+        <h1 class="invoice-title">FACTURE</h1>
+        <div class="invoice-meta-row">
+          <span class="inv-label">Facture N°:</span>
+          <span class="inv-val">FAC-{{ commandeId }}</span>
+        </div>
+        <div class="invoice-meta-row">
+          <span class="inv-label">Date:</span>
+          <span class="inv-val">{{ commande()!.dateCommande | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="invoice-meta-row">
+          <span class="inv-label">Statut:</span>
+          <span class="badge" [class.badge-warning]="commande()!.statut === 'EN_ATTENTE'"
+            [class.badge-success]="commande()!.statut === 'CONFIRMEE'" [class.badge-info]="commande()!.statut === 'LIVREE'">
+            {{ commande()!.statut }}
+          </span>
+        </div>
       </div>
-      <div class="ligne-info">
-        <span class="cle">Date</span>
-        <span class="valeur">{{ commande()!.dateCommande | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+
+    <div class="invoice-addresses">
+      <div class="inv-address-box">
+        <h4>Facturé à :</h4>
+        <p class="client-name">{{ commande()!.clientNom }}</p>
+        <p>Client enregistré dans notre boutique</p>
       </div>
+      <div class="inv-address-box">
+        <h4>Mode de Règlement :</h4>
+        <p>Paiement à la livraison / Virement</p>
+        <p>Devise : TND (Dinar Tunisien)</p>
+      </div>
+    </div>
+
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="text-right">Montant Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <strong>Commande globale d'articles boutique #{{ commandeId }}</strong>
+            <p class="item-desc">Traitement et préparation inclus</p>
+          </td>
+          <td class="text-right font-bold">{{ commande()!.montantTotal | number:'1.2-2' }} TND</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="invoice-summary">
+      <div class="summary-rows">
+        <div class="summary-line">
+          <span>Sous-total HT:</span>
+          <span>{{ (commande()!.montantTotal / 1.19) | number:'1.2-2' }} TND</span>
+        </div>
+        <div class="summary-line">
+          <span>TVA (19%):</span>
+          <span>{{ (commande()!.montantTotal - (commande()!.montantTotal / 1.19)) | number:'1.2-2' }} TND</span>
+        </div>
+        <div class="summary-line total-line">
+          <span>Montant Total TTC:</span>
+          <span>{{ commande()!.montantTotal | number:'1.2-2' }} TND</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="invoice-footer">
+      <p>Merci pour votre confiance ! Pour toute question concernant cette facture, contactez notre service client.</p>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">Historique détaillé</div>
+  <!-- Historique Card -->
+  <div class="card no-print">
+    <div class="card-title">Historique des statuts</div>
     <div class="historique-list">
       <div class="historique-row" *ngFor="let h of historique()">
         <span class="badge" [class.badge-warning]="h.statut === 'EN_ATTENTE'"
@@ -73,7 +150,7 @@
 
       <div class="empty-state" *ngIf="historique().length === 0">
         <i class="ti ti-history"></i>
-        <span>Aucun historique disponible</span>
+        <span>Aucun historique de statut disponible</span>
       </div>
     </div>
   </div>

@@ -20,8 +20,13 @@ export class Register {
   messageErreur = signal('');
   messageSucces = signal('');
   isLoading = signal(false);
+  masquerMotDePasse = signal(true);
 
   constructor(private authService: AuthService, private route: Router) { }
+
+  toggleMotDePasse() {
+    this.masquerMotDePasse.set(!this.masquerMotDePasse());
+  }
 
   inscrire() {
     this.isLoading.set(true);
@@ -34,17 +39,17 @@ export class Register {
       password: this.password,
       role: this.role
     }).subscribe({
-      next: (response) => {
-        this.messageSucces.set("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+      next: () => {
+        this.messageSucces.set("Inscription réussie ! Redirection vers la page de connexion...");
         this.isLoading.set(false);
-        setTimeout(() => this.route.navigate(['/login']), 2000);
+        setTimeout(() => this.route.navigate(['/login']), 1800);
       },
       error: (error) => {
         try {
           const erreurParsee = JSON.parse(error.error);
           this.messageErreur.set(erreurParsee.message);
-        } catch (e) {
-          this.messageErreur.set("Une erreur est survenue lors de l'inscription.");
+        } catch {
+          this.messageErreur.set(typeof error.error === 'string' ? error.error : "Une erreur est survenue lors de l'inscription.");
         }
         this.isLoading.set(false);
       }

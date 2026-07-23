@@ -1,43 +1,59 @@
 <div class="auth-page">
   <div class="auth-box">
-    <div class="auth-icon">
+    <div class="auth-logo-badge">
       <i class="ti ti-user-plus"></i>
     </div>
     <h1>Inscription</h1>
-    <p class="sous-titre">Créez votre compte en 30 secondes</p>
+    <p class="sous-titre">Créez votre compte rapidement pour démarrer.</p>
 
-    <div class="alerte" *ngIf="messageErreur()">
+    <div class="alerte-erreur" *ngIf="messageErreur()">
       <i class="ti ti-alert-triangle"></i>
       <span>{{ messageErreur() }}</span>
     </div>
 
-    <div class="success" *ngIf="messageSucces()">
-      <i class="ti ti-check"></i>
+    <div class="alerte-succes" *ngIf="messageSucces()">
+      <i class="ti ti-circle-check"></i>
       <span>{{ messageSucces() }}</span>
     </div>
+
     <form (ngSubmit)="inscrire()">
       <div class="champ">
-        <label>Username</label>
-        <input type="text" [(ngModel)]="username" name="username" placeholder="khalil" required>
+        <label>Nom d'utilisateur</label>
+        <div class="input-with-icon">
+          <i class="ti ti-user input-icon"></i>
+          <input type="text" [(ngModel)]="username" name="username" placeholder="ex: khalil" required>
+        </div>
       </div>
 
       <div class="champ">
-        <label>Email</label>
-        <input type="email" [(ngModel)]="email" name="email" placeholder="khalil@email.com" required>
+        <label>Adresse E-mail</label>
+        <div class="input-with-icon">
+          <i class="ti ti-mail input-icon"></i>
+          <input type="email" [(ngModel)]="email" name="email" placeholder="ex: khalil@exemple.tn" required>
+        </div>
       </div>
 
       <div class="champ">
         <label>Mot de passe</label>
-        <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required minlength="6">
+        <div class="input-with-icon">
+          <i class="ti ti-lock input-icon"></i>
+          <input [type]="masquerMotDePasse() ? 'password' : 'text'" [(ngModel)]="password" name="password" placeholder="••••••••" required minlength="6">
+          <button type="button" class="pwd-toggle-btn" (click)="toggleMotDePasse()">
+            <i class="ti" [class.ti-eye]="masquerMotDePasse()" [class.ti-eye-off]="!masquerMotDePasse()"></i>
+          </button>
+        </div>
       </div>
 
       <div class="champ">
         <label>Rôle</label>
-        <select [(ngModel)]="role" name="role">
-          <option value="CLIENT">Client</option>
-          <option value="VENDEUR">Vendeur</option>
-          <option value="ADMIN">Admin</option>
-        </select>
+        <div class="input-with-icon">
+          <i class="ti ti-shield input-icon"></i>
+          <select [(ngModel)]="role" name="role" class="form-select">
+            <option value="CLIENT">Client</option>
+            <option value="VENDEUR">Vendeur</option>
+            <option value="ADMIN">Administrateur</option>
+          </select>
+        </div>
       </div>
 
       <button type="submit" class="btn-full" [disabled]="isLoading()">
@@ -49,7 +65,7 @@
     </form>
 
     <p class="lien-bas">
-      Déjà un compte ? <a routerLink="/login">Se connecter</a>
+      Vous avez déjà un compte ? <a routerLink="/login">Se connecter</a>
     </p>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClientService } from '../../services/client';
@@ -22,6 +22,19 @@ export class Clients implements OnInit {
   afficherFormulaire = signal(false);
   messageErreur = signal('');
   idASupprimer: number | null = null;
+
+  // Search filter signal
+  searchQuery = signal<string>('');
+
+  filteredClients = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    return this.clients().filter(c => 
+      !query || 
+      c.nom.toLowerCase().includes(query) || 
+      c.email.toLowerCase().includes(query) || 
+      c.telephone.includes(query)
+    );
+  });
 
   constructor(private clientService: ClientService) { }
 
@@ -103,9 +116,7 @@ export class Clients implements OnInit {
   }
 
   confirmerSuppression(): void {
-    if (this.idASupprimer === null) {
-      return;
-    }
+    if (this.idASupprimer === null) return;
     this.clientService.deleteById(this.idASupprimer).subscribe({
       next: () => {
         this.idASupprimer = null;

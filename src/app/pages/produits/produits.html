@@ -2,35 +2,111 @@
   <div class="page-header">
     <div>
       <h1>Produits</h1>
-      <p class="page-subtitle">Gérez votre catalogue de produits</p>
+      <p class="page-subtitle">Gérez votre catalogue, stocks et catégories de produits.</p>
     </div>
     <button class="btn-primary" (click)="ouvrirFormulaireCreation()">
       <i class="ti ti-plus"></i> Nouveau produit
     </button>
   </div>
 
-  <div class="card">
+  <!-- Filter & Controls Bar -->
+  <div class="filter-controls-card">
+    <div class="search-input-wrapper">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" placeholder="Rechercher un produit ou catégorie..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+    </div>
+
+    <div class="filter-dropdowns">
+      <select [ngModel]="selectedCategoryFilter()" (ngModelChange)="selectedCategoryFilter.set(+$event)">
+        <option [value]="0">Toutes les catégories</option>
+        <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.nom }}</option>
+      </select>
+
+      <select [ngModel]="stockFilter()" (ngModelChange)="stockFilter.set($event)">
+        <option value="TOUS">Tous les stocks</option>
+        <option value="EN_STOCK">En stock (> 0)</option>
+        <option value="RUPTURE">Rupture de stock (= 0)</option>
+      </select>
+
+      <div class="view-toggle-buttons">
+        <button class="view-btn" [class.active]="vueMode() === 'grille'" (click)="setVueMode('grille')" title="Vue Grille">
+          <i class="ti ti-layout-grid"></i>
+        </button>
+        <button class="view-btn" [class.active]="vueMode() === 'liste'" (click)="setVueMode('liste')" title="Vue Liste">
+          <i class="ti ti-list"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Count Badge -->
+  <div class="results-meta">
+    <span>Affichage de <strong>{{ filteredProduits().length }}</strong> produit(s)</span>
+  </div>
+
+  <!-- Grid View -->
+  <div class="products-grid" *ngIf="vueMode() === 'grille' && filteredProduits().length > 0">
+    <div class="product-card" *ngFor="let prod of filteredProduits()">
+      <div class="product-image-container">
+        <img *ngIf="prod.imageUrl" [src]="prod.imageUrl" [alt]="prod.nom" class="product-img" />
+        <div *ngIf="!prod.imageUrl" class="product-img-placeholder">
+          <i class="ti ti-package"></i>
+        </div>
+        <span class="category-badge">{{ prod.categorieNom || 'Non classé' }}</span>
+        <span class="stock-status-badge" [class.in-stock]="prod.stock > 5" [class.low-stock]="prod.stock > 0 && prod.stock <= 5" [class.out-of-stock]="prod.stock === 0">
+          {{ prod.stock === 0 ? 'Rupture' : (prod.stock <= 5 ? prod.stock + ' restants' : 'En stock') }}
+        </span>
+      </div>
+
+      <div class="product-card-body">
+        <h3 class="product-title">{{ prod.nom }}</h3>
+        <div class="product-price-row">
+          <span class="product-price">{{ prod.prix | number:'1.2-2' }} TND</span>
+          <span class="product-stock-qty">Stock: {{ prod.stock }}</span>
+        </div>
+
+        <div class="product-card-actions">
+          <button class="btn-action edit-btn" (click)="ouvrirFormulaireEdition(prod)">
+            <i class="ti ti-edit"></i> Modifier
+          </button>
+          <button class="btn-action delete-btn" (click)="demanderSuppression(prod.id)">
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table View -->
+  <div class="card table-card" *ngIf="vueMode() === 'liste' && filteredProduits().length > 0">
     <table class="tableau">
       <thead>
         <tr>
+          <th>Visuel</th>
           <th>Produit</th>
           <th>Catégorie</th>
           <th>Prix</th>
           <th>Stock</th>
-          <th>Actions</th>
+          <th class="text-right">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let produit of produits()">
-          <td class="nom-produit">{{ produit.nom }}</td>
-          <td>{{ produit.categorieNom }}</td>
-          <td>{{ produit.prix }} TND</td>
+        <tr *ngFor="let produit of filteredProduits()">
           <td>
-            <span [ngClass]="produit.stock < 5 ? 'badge badge-danger' : 'badge badge-success'">
-              {{ produit.stock }}
+            <div class="table-img-wrapper">
+              <img *ngIf="produit.imageUrl" [src]="produit.imageUrl" [alt]="produit.nom" />
+              <i *ngIf="!produit.imageUrl" class="ti ti-package"></i>
+            </div>
+          </td>
+          <td class="nom-produit">{{ produit.nom }}</td>
+          <td><span class="badge badge-info">{{ produit.categorieNom || 'Non classé' }}</span></td>
+          <td class="font-bold">{{ produit.prix | number:'1.2-2' }} TND</td>
+          <td>
+            <span [ngClass]="produit.stock === 0 ? 'badge badge-danger' : (produit.stock <= 5 ? 'badge badge-warning' : 'badge badge-success')">
+              {{ produit.stock === 0 ? 'Rupture' : produit.stock + ' en stock' }}
             </span>
           </td>
-          <td class="actions">
+          <td class="actions text-right">
             <button class="btn-icon" (click)="ouvrirFormulaireEdition(produit)">
               <i class="ti ti-edit"></i>
             </button>
@@ -41,48 +117,58 @@
         </tr>
       </tbody>
     </table>
+  </div>
 
-    <div class="empty-state" *ngIf="produits().length === 0">
-      <i class="ti ti-box"></i>
-      <span>Aucun produit pour le moment</span>
-    </div>
+  <!-- Empty State -->
+  <div class="card empty-card" *ngIf="filteredProduits().length === 0">
+    <i class="ti ti-box-x"></i>
+    <h3>Aucun produit trouvé</h3>
+    <p>Essayez de modifier votre recherche ou d'ajouter un nouveau produit.</p>
+    <button class="btn-primary btn-sm" (click)="ouvrirFormulaireCreation()">
+      <i class="ti ti-plus"></i> Créer un produit
+    </button>
   </div>
 </div>
+
+<!-- Modal Form -->
 <div class="modal-overlay" *ngIf="afficherFormulaire()" (click)="fermerFormulaire()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>
-        <i class="ti ti-box" style="color: #185FA5; font-size: 22px;"></i>
+        <i class="ti ti-box modal-header-icon"></i>
         {{ produitEnEdition ? 'Modifier le produit' : 'Nouveau produit' }}
       </h2>
       <button class="btn-close" (click)="fermerFormulaire()">
         <i class="ti ti-x"></i>
       </button>
     </div>
-    <div class="alerte" *ngIf="messageErreur()">
+
+    <div class="alerte-erreur" *ngIf="messageErreur()">
       <i class="ti ti-alert-triangle"></i>
       <span>{{ messageErreur() }}</span>
     </div>
-    <form (ngSubmit)="enregistrer()">
-      <div class="champ">
+
+    <form (ngSubmit)="enregistrer()" class="modal-form">
+      <div class="form-group">
         <label>Nom du produit</label>
-        <input type="text" [(ngModel)]="nom" name="nom" placeholder="Laptop Dell" required>
+        <input type="text" class="form-control" [(ngModel)]="nom" name="nom" placeholder="ex: PC Portable Asus ZenBook" required />
       </div>
 
-      <div class="champ-row">
-        <div class="champ">
+      <div class="form-row">
+        <div class="form-group">
           <label>Prix (TND)</label>
-          <input type="number" [(ngModel)]="prix" name="prix" placeholder="0" required min="0">
+          <input type="number" class="form-control" [(ngModel)]="prix" name="prix" placeholder="0.00" required min="0" step="0.01" />
         </div>
-        <div class="champ">
-          <label>Stock</label>
-          <input type="number" [(ngModel)]="stock" name="stock" placeholder="0" required min="0">
+
+        <div class="form-group">
+          <label>Quantité en Stock</label>
+          <input type="number" class="form-control" [(ngModel)]="stock" name="stock" placeholder="0" required min="0" />
         </div>
       </div>
 
-      <div class="champ">
+      <div class="form-group">
         <label>Catégorie</label>
-        <select [(ngModel)]="categorieId" name="categorieId" required>
+        <select class="form-control" [(ngModel)]="categorieId" name="categorieId" required>
           <option [value]="0" disabled>Sélectionner une catégorie</option>
           <option *ngFor="let categorie of categories()" [value]="categorie.id">
             {{ categorie.nom }}
@@ -90,26 +176,37 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label>URL de l'image (optionnel)</label>
+        <input type="url" class="form-control" [(ngModel)]="imageUrl" name="imageUrl" placeholder="https://exemple.com/image.jpg" />
+        <div class="image-preview" *ngIf="imageUrl">
+          <img [src]="imageUrl" alt="Aperçu" (error)="imageUrl = ''" />
+        </div>
+      </div>
+
       <div class="modal-actions">
-        <button type="button" class="btn-secondary" (click)="fermerFormulaire()">Annuler</button>
-        <button type="submit" class="btn-primary">
-          {{ produitEnEdition ? 'Modifier' : 'Créer' }}
+        <button type="button" class="btn btn-secondary" (click)="fermerFormulaire()">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-check"></i> {{ produitEnEdition ? 'Enregistrer' : 'Créer' }}
         </button>
       </div>
     </form>
   </div>
 </div>
 
+<!-- Modal Confirmation Suppression -->
 <div class="modal-overlay" *ngIf="idASupprimer !== null" (click)="annulerSuppression()">
-  <div class="modal-box modal-confirm" (click)="$event.stopPropagation()">
+  <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
     <div class="modal-icon-danger">
       <i class="ti ti-alert-triangle"></i>
     </div>
     <h2>Supprimer ce produit ?</h2>
-    <p class="page-subtitle">Cette action est irréversible.</p>
+    <p class="modal-confirm-desc">Cette action est irréversible et retirera définitivement ce produit du catalogue.</p>
     <div class="modal-actions">
-      <button type="button" class="btn-secondary" (click)="annulerSuppression()">Annuler</button>
-      <button type="button" class="btn-danger" (click)="confirmerSuppression()">Supprimer</button>
+      <button type="button" class="btn btn-secondary" (click)="annulerSuppression()">Annuler</button>
+      <button type="button" class="btn btn-danger" (click)="confirmerSuppression()">
+        <i class="ti ti-trash"></i> Supprimer
+      </button>
     </div>
   </div>
 </div>
