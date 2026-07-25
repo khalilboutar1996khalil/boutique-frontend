@@ -90,11 +90,18 @@
   }
 }
 
-.auth-icon {
-  text-align: center;
-  font-size: 40px;
-  color: #185FA5;
-  margin-bottom: 16px;
+.auth-logo-badge {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #378ADD, #185FA5);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(24, 95, 165, 0.25);
   animation: bounce 0.6s ease-out 0.2s both;
 }
 
@@ -162,6 +169,56 @@ h1 {
   border-color: #378ADD;
   box-shadow: 0 0 0 4px rgba(55, 138, 221, 0.12);
   transform: translateY(-1px);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon input,
+.input-with-icon select.form-select {
+  padding-left: 44px;
+}
+
+.input-with-icon:has(.pwd-toggle-btn) input {
+  padding-right: 44px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 17px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.pwd-toggle-btn {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.pwd-toggle-btn:hover {
+  color: #185FA5;
 }
 
 .erreur {
@@ -233,18 +290,25 @@ h1 {
   text-decoration: underline;
 }
 
-.success {
+.alerte-succes {
   background: #EAF3DE;
   color: #3B6D11;
   font-size: 13px;
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 
-.alerte {
-  animation: shake 0.4s ease;
+.alerte-succes i {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
+.alerte-erreur {
   background: #FEF9E7;
   border: 1px solid #F5D897;
   color: #854F0B;
@@ -258,7 +322,7 @@ h1 {
   animation: shake 0.4s ease;
 }
 
-.alerte i {
+.alerte-erreur i {
   font-size: 18px;
   flex-shrink: 0;
   margin-top: 1px;
